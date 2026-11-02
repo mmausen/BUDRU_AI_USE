@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>BDR · AI Use</title>
+<link rel="stylesheet" href="styles.css?v=3"/>
+</head>
+<body>
+
+<!-- ════════════ DESKTOP REQUIRED ════════════ (gate, not a flow step) -->
+<section id="screen-mobile" class="screen" hidden>
+  <div class="centered">
+    <h1 class="screen-kicker" data-s="ui.brand"></h1>
+    <div class="panel">
+      <h2 data-s="ui.mobile.heading"></h2>
+      <p data-s="ui.mobile.body"></p>
+      <p class="muted" data-s="ui.mobile.hint"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ PARTICIPANT ID ════════════ -->
+<section id="screen-anon-id" class="screen" hidden>
+  <div class="centered">
+    <h1 class="screen-kicker" data-s="ui.brand"></h1>
+    <div class="panel">
+      <h2 data-s="ui.anonId.heading"></h2>
+      <p data-s="ui.anonId.body"></p>
+      <label class="pid-row">
+        <span data-s="ui.anonId.label"></span>
+        <input type="text" id="anon-id-input" autocomplete="off" spellcheck="false"/>
+      </label>
+      <p class="form-error" id="anon-id-error" hidden></p>
+    </div>
+    <div class="start-row">
+      <button class="btn btn-primary" id="btn-anon-id-next" data-s="ui.anonId.next"></button>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ SURVEY (pre / mid / final reuse this screen) ════════════ -->
+<section id="screen-survey" class="screen" hidden>
+  <div class="centered survey-wrap">
+    <h1 class="screen-kicker" id="survey-kicker"></h1>
+    <h2 id="survey-title"></h2>
+    <form id="survey-form" class="survey-form" onsubmit="return false"></form>
+    <div class="survey-footer">
+      <span class="form-error" id="survey-note"></span>
+      <button class="btn btn-primary" id="btn-survey-next" data-s="ui.survey.continue"></button>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ TASK ════════════
+     The interaction module mounts its board into #task-host; the intro card
+     sits on top of it until the participant presses Start. -->
+<section id="screen-task" class="screen screen-task" hidden>
+  <div id="task-top">
+    <span class="b-logo" data-s="ui.brand"></span>
+    <span class="b-div"></span>
+    <span id="task-progress"></span>
+  </div>
+  <div id="task-host"></div>
+  <div id="explainer" hidden>
+    <div class="explainer-card" role="dialog" aria-modal="true" aria-labelledby="explainer-title">
+      <div class="explainer-title" id="explainer-title"></div>
+      <div class="explainer-body" id="explainer-body"></div>
+      <button class="btn btn-primary" id="explainer-ok"></button>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ THANK YOU / END ════════════ terminal, no way forward -->
+<section id="screen-end" class="screen" hidden>
+  <div class="centered">
+    <h1 class="screen-kicker" data-s="ui.brand"></h1>
+    <div class="panel">
+      <h2 data-s="ui.end.title"></h2>
+      <p data-s="ui.end.note"></p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ DEV BAR ════════════ only with Config.CONFIG.devMode -->
+<div id="dev-bar" hidden>
+  <span class="dev-tag">DEV</span>
+  <select id="dev-jump" title="Jump to step"></select>
+  <select id="dev-taskset" title="Task set"></select>
+  <select id="dev-tasklang" title="Task language"><option value="en">EN</option><option value="de">DE</option></select>
+  <button type="button" id="dev-skip" title="Next step (Shift + →)">Skip ▸</button>
+  <button type="button" id="dev-restart" title="Start a fresh session">Restart</button>
+</div>
+
+<script src="js/config.js?v=2"></script>
+<script src="js/strings.js?v=2"></script>
+<script src="js/store.js?v=2"></script>
+<script src="js/tasks.js?v=2"></script>
+<script src="js/board.js?v=2"></script>
+<script src="js/ai-cursor.js?v=2"></script>
+<script src="js/interactions/hint.js?v=2"></script>
+<script src="js/interactions/magnet.js?v=8"></script>
+<script src="js/interactions/radial.js?v=2"></script>
+<script src="js/interactions/heatmap.js?v=2"></script>
+<script src="js/interactions/handoff.js?v=2"></script>
+<script src="js/interactions/override.js?v=2"></script>
+<script src="js/task.js?v=2"></script>
+<script src="js/screens.js?v=2"></script>
+<script src="js/flow.js?v=2"></script>
+<script src="js/main.js?v=2"></script>
+</body>
+</html>

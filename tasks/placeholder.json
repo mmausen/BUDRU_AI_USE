@@ -1,0 +1,186 @@
+{
+  "meta": {
+    "type": "placeholder",
+    "name": {
+      "de": "Platzhalter",
+      "en": "Placeholder"
+    },
+    "languages": [
+      "de",
+      "en"
+    ],
+    "tileCount": 6,
+    "labels": {
+      "de": {
+        "brief": "Ordnen Sie die sechs Fälle nach Dringlichkeit – den dringendsten nach oben.",
+        "inbox": "Eingang – neue Fälle",
+        "ladder": "Rangfolge – Fälle hierher ziehen",
+        "first": "Am dringendsten",
+        "last": "Am wenigsten dringend"
+      },
+      "en": {
+        "brief": "Rank the six cases by urgency — most urgent at the top.",
+        "inbox": "Inbox — incoming cases",
+        "ladder": "Ranking — drag cases here",
+        "first": "Most urgent",
+        "last": "Least urgent"
+      }
+    },
+    "notes": "Bilingual. STRUCTURE IS SHARED, PROSE IS PER LANGUAGE: id, tiles[].key, target-order and tiles[].heat exist once and cannot diverge between languages. target-order = tile keys top to bottom: the order the AI recommends. tiles[].heat = the probability (%) of that tile belonging in slot 1..6, used by the heatmap interaction; each row sums to 100 and each slot column to ~100. tiles[].<lang>.thought = the AI's first-person reasoning for the tile's placement (not displayed yet). The prototype shuffles the tiles."
+  },
+  "tasks": [
+    {
+      "id": "P1",
+      "de": {
+        "title": "Platzhalteraufgabe",
+        "description": "Ordnen Sie die sechs Elemente nach Dringlichkeit."
+      },
+      "en": {
+        "title": "Placeholder task",
+        "description": "Rank the six items by urgency."
+      },
+      "target-order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tiles": [
+        {
+          "key": 0,
+          "icon": "A",
+          "heat": [
+            56,
+            31,
+            11,
+            2,
+            0,
+            0
+          ],
+          "de": {
+            "text": "Element A",
+            "description": "Platzhalterbeschreibung für Element A.",
+            "thought": "Platzhalter: Element A gehört auf Platz 1."
+          },
+          "en": {
+            "text": "Item A",
+            "description": "Placeholder description for item A.",
+            "thought": "Placeholder: item A belongs in slot 1."
+          }
+        },
+        {
+          "key": 1,
+          "icon": "B",
+          "heat": [
+            31,
+            35,
+            24,
+            8,
+            2,
+            0
+          ],
+          "de": {
+            "text": "Element B",
+            "description": "Platzhalterbeschreibung für Element B.",
+            "thought": "Platzhalter: Element B gehört auf Platz 2."
+          },
+          "en": {
+            "text": "Item B",
+            "description": "Placeholder description for item B.",
+            "thought": "Placeholder: item B belongs in slot 2."
+          }
+        },
+        {
+          "key": 2,
+          "icon": "C",
+          "heat": [
+            11,
+            24,
+            32,
+            23,
+            8,
+            2
+          ],
+          "de": {
+            "text": "Element C",
+            "description": "Platzhalterbeschreibung für Element C.",
+            "thought": "Platzhalter: Element C gehört auf Platz 3."
+          },
+          "en": {
+            "text": "Item C",
+            "description": "Placeholder description for item C.",
+            "thought": "Placeholder: item C belongs in slot 3."
+          }
+        },
+        {
+          "key": 3,
+          "icon": "D",
+          "heat": [
+            2,
+            8,
+            23,
+            32,
+            24,
+            11
+          ],
+          "de": {
+            "text": "Element D",
+            "description": "Platzhalterbeschreibung für Element D.",
+            "thought": "Platzhalter: Element D gehört auf Platz 4."
+          },
+          "en": {
+            "text": "Item D",
+            "description": "Placeholder description for item D.",
+            "thought": "Placeholder: item D belongs in slot 4."
+          }
+        },
+        {
+          "key": 4,
+          "icon": "E",
+          "heat": [
+            0,
+            2,
+            8,
+            24,
+            35,
+            31
+          ],
+          "de": {
+            "text": "Element E",
+            "description": "Platzhalterbeschreibung für Element E.",
+            "thought": "Platzhalter: Element E gehört auf Platz 5."
+          },
+          "en": {
+            "text": "Item E",
+            "description": "Placeholder description for item E.",
+            "thought": "Placeholder: item E belongs in slot 5."
+          }
+        },
+        {
+          "key": 5,
+          "icon": "F",
+          "heat": [
+            0,
+            0,
+            2,
+            11,
+            31,
+            56
+          ],
+          "de": {
+            "text": "Element F",
+            "description": "Platzhalterbeschreibung für Element F.",
+            "thought": "Platzhalter: Element F gehört auf Platz 6."
+          },
+          "en": {
+            "text": "Item F",
+            "description": "Placeholder description for item F.",
+            "thought": "Placeholder: item F belongs in slot 6."
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,921 @@
+{
+  "meta": {
+    "type": "fixed",
+    "name": {
+      "de": "Feste Reihenfolge",
+      "en": "Fixed order"
+    },
+    "languages": [
+      "de",
+      "en"
+    ],
+    "tileCount": 6,
+    "labels": {
+      "de": {
+        "brief": "Bringen Sie die sechs Schritte in die richtige Reihenfolge – den ersten nach oben.",
+        "inbox": "Schritte",
+        "ladder": "Reihenfolge – Schritte hierher ziehen",
+        "first": "Erster Schritt",
+        "last": "Letzter Schritt"
+      },
+      "en": {
+        "brief": "Put the six steps in the right order — the first step at the top.",
+        "inbox": "Steps",
+        "ladder": "Sequence — drag steps here",
+        "first": "First step",
+        "last": "Last step"
+      }
+    },
+    "notes": "Bilingual. STRUCTURE IS SHARED, PROSE IS PER LANGUAGE: id, tiles[].key, target-order and tiles[].heat exist once and cannot diverge between languages. target-order = tile keys top to bottom: the order the AI recommends. tiles[].heat = the probability (%) of that tile belonging in slot 1..6, used by the heatmap interaction; each row sums to 100 and each slot column to ~100. tiles[].<lang>.thought = the AI's first-person reasoning for the tile's placement (not displayed yet). The prototype shuffles the tiles."
+  },
+  "tasks": [
+    {
+      "id": "F1",
+      "source": "designing-trust-pt task_thought.json A01",
+      "de": {
+        "title": "Die Post muss raus",
+        "description": "Ein wichtiger Brief an einen Kunden muss heute noch raus. Bitte bringen Sie die folgenden Schritte in die richtige Reihenfolge."
+      },
+      "en": {
+        "title": "The Mail Has to Go Out",
+        "description": "An important letter to a client needs to go out today. Please put the following steps in the right order."
+      },
+      "target-order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tiles": [
+        {
+          "key": 0,
+          "heat": [
+            81,
+            18,
+            1,
+            0,
+            0,
+            0
+          ],
+          "de": {
+            "text": "Brief am Computer schreiben",
+            "description": "",
+            "thought": "Ohne Text kein Brief – zuerst muss ich ihn am Computer verfassen."
+          },
+          "en": {
+            "text": "Write the letter on the computer",
+            "description": "",
+            "thought": "No text, no letter — first I have to write it on the computer."
+          }
+        },
+        {
+          "key": 1,
+          "heat": [
+            18,
+            64,
+            17,
+            1,
+            0,
+            0
+          ],
+          "de": {
+            "text": "Brief ausdrucken",
+            "description": "",
+            "thought": "Nur was geschrieben ist, kann ich ausdrucken."
+          },
+          "en": {
+            "text": "Print the letter",
+            "description": "",
+            "thought": "I can only print what's been written."
+          }
+        },
+        {
+          "key": 2,
+          "heat": [
+            1,
+            16,
+            66,
+            17,
+            0,
+            0
+          ],
+          "de": {
+            "text": "Brief unterschreiben",
+            "description": "",
+            "thought": "Die Unterschrift gehört aufs gedruckte Papier."
+          },
+          "en": {
+            "text": "Sign the letter",
+            "description": "",
+            "thought": "The signature goes on the printed page."
+          }
+        },
+        {
+          "key": 3,
+          "heat": [
+            0,
+            0,
+            17,
+            66,
+            16,
+            1
+          ],
+          "de": {
+            "text": "Brief in den Umschlag stecken",
+            "description": "",
+            "thought": "Der unterschriebene Brief kommt jetzt in den Umschlag."
+          },
+          "en": {
+            "text": "Put the letter in the envelope",
+            "description": "",
+            "thought": "The signed letter now goes into the envelope."
+          }
+        },
+        {
+          "key": 4,
+          "heat": [
+            0,
+            0,
+            1,
+            17,
+            64,
+            18
+          ],
+          "de": {
+            "text": "Umschlag zukleben",
+            "description": "",
+            "thought": "Erst wenn der Brief drin ist, klebe ich den Umschlag zu."
+          },
+          "en": {
+            "text": "Seal the envelope",
+            "description": "",
+            "thought": "Once the letter is inside, I seal the envelope."
+          }
+        },
+        {
+          "key": 5,
+          "heat": [
+            0,
+            0,
+            0,
+            1,
+            18,
+            81
+          ],
+          "de": {
+            "text": "Brief in den Briefkasten werfen",
+            "description": "",
+            "thought": "Verschlossen und fertig – ab in den Briefkasten."
+          },
+          "en": {
+            "text": "Drop the letter in the mailbox",
+            "description": "",
+            "thought": "Sealed and done — off to the mailbox."
+          }
+        }
+      ]
+    },
+    {
+      "id": "F2",
+      "source": "designing-trust-pt task_thought.json A09",
+      "de": {
+        "title": "Überraschung in der Küche",
+        "description": "Ihre Kollegin hat Geburtstag. Bitte ordnen Sie die Schritte der Büro-Überraschung chronologisch."
+      },
+      "en": {
+        "title": "Surprise in the Kitchen",
+        "description": "Your colleague has a birthday. Please order the steps of the office surprise chronologically."
+      },
+      "target-order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tiles": [
+        {
+          "key": 0,
+          "heat": [
+            81,
+            18,
+            1,
+            0,
+            0,
+            0
+          ],
+          "de": {
+            "text": "Geburtstag im Kalender entdecken",
+            "description": "",
+            "thought": "Im Kalender sehe ich: Sie hat Geburtstag!"
+          },
+          "en": {
+            "text": "Spot the birthday in the calendar",
+            "description": "",
+            "thought": "The calendar shows it: it's her birthday!"
+          }
+        },
+        {
+          "key": 1,
+          "heat": [
+            18,
+            64,
+            17,
+            1,
+            0,
+            0
+          ],
+          "de": {
+            "text": "Zutaten für den Kuchen einkaufen",
+            "description": "",
+            "thought": "Für den Kuchen kaufe ich die Zutaten ein."
+          },
+          "en": {
+            "text": "Buy the ingredients for the cake",
+            "description": "",
+            "thought": "For the cake I buy the ingredients."
+          }
+        },
+        {
+          "key": 2,
+          "heat": [
+            1,
+            16,
+            66,
+            17,
+            0,
+            0
+          ],
+          "de": {
+            "text": "Kuchen backen",
+            "description": "",
+            "thought": "Zu Hause wird gebacken."
+          },
+          "en": {
+            "text": "Bake the cake",
+            "description": "",
+            "thought": "Back home, baking time."
+          }
+        },
+        {
+          "key": 3,
+          "heat": [
+            0,
+            0,
+            17,
+            66,
+            16,
+            1
+          ],
+          "de": {
+            "text": "Kuchen ins Büro bringen",
+            "description": "",
+            "thought": "Den fertigen Kuchen bringe ich ins Büro."
+          },
+          "en": {
+            "text": "Bring the cake to the office",
+            "description": "",
+            "thought": "I bring the finished cake to the office."
+          }
+        },
+        {
+          "key": 4,
+          "heat": [
+            0,
+            0,
+            1,
+            17,
+            64,
+            18
+          ],
+          "de": {
+            "text": "Kuchen anschneiden",
+            "description": "",
+            "thought": "In der Küche schneide ich ihn an."
+          },
+          "en": {
+            "text": "Cut the cake",
+            "description": "",
+            "thought": "In the kitchen I cut it."
+          }
+        },
+        {
+          "key": 5,
+          "heat": [
+            0,
+            0,
+            0,
+            1,
+            18,
+            81
+          ],
+          "de": {
+            "text": "Kuchenstücke an die Kollegen verteilen",
+            "description": "",
+            "thought": "Die Stücke verteile ich an die Kollegen."
+          },
+          "en": {
+            "text": "Hand out the cake slices to the colleagues",
+            "description": "",
+            "thought": "I hand the slices out to the colleagues."
+          }
+        }
+      ]
+    },
+    {
+      "id": "F3",
+      "source": "designing-trust-pt task_thought.json A12",
+      "de": {
+        "title": "Eine Rechnung flattert rein",
+        "description": "In der Buchhaltung landet eine neue Eingangsrechnung. Bitte ordnen Sie die Bearbeitungsschritte."
+      },
+      "en": {
+        "title": "An Invoice Lands on Your Desk",
+        "description": "A new incoming invoice arrives in accounting. Please order the processing steps."
+      },
+      "target-order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tiles": [
+        {
+          "key": 0,
+          "heat": [
+            81,
+            18,
+            1,
+            0,
+            0,
+            0
+          ],
+          "de": {
+            "text": "Rechnung per Post erhalten",
+            "description": "",
+            "thought": "Die Rechnung liegt auf dem Tisch – los geht's."
+          },
+          "en": {
+            "text": "Receive the invoice by mail",
+            "description": "",
+            "thought": "The invoice is on the desk — let's get going."
+          }
+        },
+        {
+          "key": 1,
+          "heat": [
+            18,
+            64,
+            17,
+            1,
+            0,
+            0
+          ],
+          "de": {
+            "text": "Rechnung inhaltlich prüfen",
+            "description": "",
+            "thought": "Erst prüfe ich, ob alles stimmt."
+          },
+          "en": {
+            "text": "Check the invoice for accuracy",
+            "description": "",
+            "thought": "First I check whether everything's correct."
+          }
+        },
+        {
+          "key": 2,
+          "heat": [
+            1,
+            16,
+            66,
+            17,
+            0,
+            0
+          ],
+          "de": {
+            "text": "Geprüfte Rechnung zur Freigabe vorlegen",
+            "description": "",
+            "thought": "Die geprüfte Rechnung lege ich zur Freigabe vor."
+          },
+          "en": {
+            "text": "Submit the checked invoice for approval",
+            "description": "",
+            "thought": "I submit the checked invoice for approval."
+          }
+        },
+        {
+          "key": 3,
+          "heat": [
+            0,
+            0,
+            17,
+            66,
+            16,
+            1
+          ],
+          "de": {
+            "text": "Betrag überweisen",
+            "description": "",
+            "thought": "Nach der Freigabe überweise ich den Betrag."
+          },
+          "en": {
+            "text": "Transfer the amount",
+            "description": "",
+            "thought": "Once approved, I transfer the amount."
+          }
+        },
+        {
+          "key": 4,
+          "heat": [
+            0,
+            0,
+            1,
+            17,
+            64,
+            18
+          ],
+          "de": {
+            "text": "Zahlungsbestätigung erhalten",
+            "description": "",
+            "thought": "Die Zahlungsbestätigung kommt herein."
+          },
+          "en": {
+            "text": "Receive the payment confirmation",
+            "description": "",
+            "thought": "The payment confirmation comes in."
+          }
+        },
+        {
+          "key": 5,
+          "heat": [
+            0,
+            0,
+            0,
+            1,
+            18,
+            81
+          ],
+          "de": {
+            "text": "Vorgang archivieren",
+            "description": "",
+            "thought": "Der Vorgang wandert ins Archiv."
+          },
+          "en": {
+            "text": "Archive the case",
+            "description": "",
+            "thought": "The case goes into the archive."
+          }
+        }
+      ]
+    },
+    {
+      "id": "F4",
+      "source": "designing-trust-pt task_thought.json A15",
+      "de": {
+        "title": "Passwort? Vergessen!",
+        "description": "Nach dem Urlaub fällt Ihnen Ihr Passwort nicht mehr ein. Bitte ordnen Sie die Schritte bis zum erfolgreichen Login."
+      },
+      "en": {
+        "title": "Password? Forgotten!",
+        "description": "After your vacation you can't remember your password. Please order the steps to a successful login."
+      },
+      "target-order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tiles": [
+        {
+          "key": 0,
+          "heat": [
+            81,
+            18,
+            1,
+            0,
+            0,
+            0
+          ],
+          "de": {
+            "text": "Login-Seite öffnen",
+            "description": "",
+            "thought": "Ich öffne die Login-Seite wie immer."
+          },
+          "en": {
+            "text": "Open the login page",
+            "description": "",
+            "thought": "I open the login page as usual."
+          }
+        },
+        {
+          "key": 1,
+          "heat": [
+            18,
+            64,
+            17,
+            1,
+            0,
+            0
+          ],
+          "de": {
+            "text": "Auf „Passwort vergessen“ klicken",
+            "description": "",
+            "thought": "Ohne Passwort hilft nur: „Passwort vergessen“ klicken."
+          },
+          "en": {
+            "text": "Click 'Forgot password'",
+            "description": "",
+            "thought": "No password — the only way is 'Forgot password'."
+          }
+        },
+        {
+          "key": 2,
+          "heat": [
+            1,
+            16,
+            66,
+            17,
+            0,
+            0
+          ],
+          "de": {
+            "text": "Reset-Link per E-Mail erhalten",
+            "description": "",
+            "thought": "Der Reset-Link landet in meinem Postfach."
+          },
+          "en": {
+            "text": "Receive the reset link by email",
+            "description": "",
+            "thought": "The reset link lands in my inbox."
+          }
+        },
+        {
+          "key": 3,
+          "heat": [
+            0,
+            0,
+            17,
+            66,
+            16,
+            1
+          ],
+          "de": {
+            "text": "Reset-Link öffnen",
+            "description": "",
+            "thought": "Ich öffne den Link aus der Mail."
+          },
+          "en": {
+            "text": "Open the reset link",
+            "description": "",
+            "thought": "I open the link from the email."
+          }
+        },
+        {
+          "key": 4,
+          "heat": [
+            0,
+            0,
+            1,
+            17,
+            64,
+            18
+          ],
+          "de": {
+            "text": "Neues Passwort vergeben",
+            "description": "",
+            "thought": "Jetzt vergebe ich ein neues Passwort."
+          },
+          "en": {
+            "text": "Set a new password",
+            "description": "",
+            "thought": "Now I set a new password."
+          }
+        },
+        {
+          "key": 5,
+          "heat": [
+            0,
+            0,
+            0,
+            1,
+            18,
+            81
+          ],
+          "de": {
+            "text": "Mit dem neuen Passwort einloggen",
+            "description": "",
+            "thought": "Mit dem neuen Passwort klappt der Login."
+          },
+          "en": {
+            "text": "Log in with the new password",
+            "description": "",
+            "thought": "With the new password the login works."
+          }
+        }
+      ]
+    },
+    {
+      "id": "F5",
+      "source": "designing-trust-pt task_thought.json A23",
+      "de": {
+        "title": "Umzug ins neue Büro",
+        "description": "Ihre Abteilung zieht ein Stockwerk höher. Bitte ordnen Sie den Umzugstag chronologisch."
+      },
+      "en": {
+        "title": "Moving to the New Office",
+        "description": "Your department is moving up one floor. Please order the moving day chronologically."
+      },
+      "target-order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tiles": [
+        {
+          "key": 0,
+          "heat": [
+            81,
+            18,
+            1,
+            0,
+            0,
+            0
+          ],
+          "de": {
+            "text": "Schreibtischsachen in Kartons packen",
+            "description": "",
+            "thought": "Alles vom Schreibtisch wandert in Kartons."
+          },
+          "en": {
+            "text": "Pack the desk items into boxes",
+            "description": "",
+            "thought": "Everything off the desk goes into boxes."
+          }
+        },
+        {
+          "key": 1,
+          "heat": [
+            18,
+            64,
+            17,
+            1,
+            0,
+            0
+          ],
+          "de": {
+            "text": "Kartons zukleben",
+            "description": "",
+            "thought": "Die vollen Kartons klebe ich zu."
+          },
+          "en": {
+            "text": "Tape the boxes shut",
+            "description": "",
+            "thought": "I tape the full boxes shut."
+          }
+        },
+        {
+          "key": 2,
+          "heat": [
+            1,
+            16,
+            66,
+            17,
+            0,
+            0
+          ],
+          "de": {
+            "text": "Kartons ins neue Büro tragen",
+            "description": "",
+            "thought": "Dann trage ich sie ein Stockwerk höher."
+          },
+          "en": {
+            "text": "Carry the boxes to the new office",
+            "description": "",
+            "thought": "Then I carry them up one floor."
+          }
+        },
+        {
+          "key": 3,
+          "heat": [
+            0,
+            0,
+            17,
+            66,
+            16,
+            1
+          ],
+          "de": {
+            "text": "Kartons wieder aufschneiden",
+            "description": "",
+            "thought": "Oben schneide ich die Kartons wieder auf."
+          },
+          "en": {
+            "text": "Cut the boxes back open",
+            "description": "",
+            "thought": "Upstairs I cut the boxes back open."
+          }
+        },
+        {
+          "key": 4,
+          "heat": [
+            0,
+            0,
+            1,
+            17,
+            64,
+            18
+          ],
+          "de": {
+            "text": "Sachen auspacken und einräumen",
+            "description": "",
+            "thought": "Ich packe aus und räume alles ein."
+          },
+          "en": {
+            "text": "Unpack and put things away",
+            "description": "",
+            "thought": "I unpack and put everything away."
+          }
+        },
+        {
+          "key": 5,
+          "heat": [
+            0,
+            0,
+            0,
+            1,
+            18,
+            81
+          ],
+          "de": {
+            "text": "Leere Kartons ins Lager zurückbringen",
+            "description": "",
+            "thought": "Die leeren Kartons bringe ich ins Lager zurück."
+          },
+          "en": {
+            "text": "Take the empty boxes back to storage",
+            "description": "",
+            "thought": "The empty boxes go back to storage."
+          }
+        }
+      ]
+    },
+    {
+      "id": "F6",
+      "source": "designing-trust-pt task_thought.json A24",
+      "de": {
+        "title": "Papierstau!",
+        "description": "Der Drucker streikt mal wieder. Bitte ordnen Sie die Schritte bis zum fertigen Ausdruck."
+      },
+      "en": {
+        "title": "Paper Jam!",
+        "description": "The printer is acting up again. Please order the steps to a finished printout."
+      },
+      "target-order": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "tiles": [
+        {
+          "key": 0,
+          "heat": [
+            81,
+            18,
+            1,
+            0,
+            0,
+            0
+          ],
+          "de": {
+            "text": "Papierstau-Meldung erscheint",
+            "description": "",
+            "thought": "Der Drucker meldet: Papierstau."
+          },
+          "en": {
+            "text": "The paper jam message appears",
+            "description": "",
+            "thought": "The printer reports: paper jam."
+          }
+        },
+        {
+          "key": 1,
+          "heat": [
+            18,
+            64,
+            17,
+            1,
+            0,
+            0
+          ],
+          "de": {
+            "text": "Druckerklappe öffnen",
+            "description": "",
+            "thought": "Ich öffne die Druckerklappe."
+          },
+          "en": {
+            "text": "Open the printer flap",
+            "description": "",
+            "thought": "I open the printer flap."
+          }
+        },
+        {
+          "key": 2,
+          "heat": [
+            1,
+            16,
+            66,
+            17,
+            0,
+            0
+          ],
+          "de": {
+            "text": "Verklemmtes Blatt entfernen",
+            "description": "",
+            "thought": "Vorsichtig ziehe ich das verklemmte Blatt heraus."
+          },
+          "en": {
+            "text": "Remove the jammed sheet",
+            "description": "",
+            "thought": "Carefully I pull out the jammed sheet."
+          }
+        },
+        {
+          "key": 3,
+          "heat": [
+            0,
+            0,
+            17,
+            66,
+            16,
+            1
+          ],
+          "de": {
+            "text": "Druckerklappe schließen",
+            "description": "",
+            "thought": "Klappe wieder zu."
+          },
+          "en": {
+            "text": "Close the printer flap",
+            "description": "",
+            "thought": "Flap shut again."
+          }
+        },
+        {
+          "key": 4,
+          "heat": [
+            0,
+            0,
+            1,
+            17,
+            64,
+            18
+          ],
+          "de": {
+            "text": "Druckauftrag erneut starten",
+            "description": "",
+            "thought": "Ich starte den Druckauftrag erneut."
+          },
+          "en": {
+            "text": "Restart the print job",
+            "description": "",
+            "thought": "I restart the print job."
+          }
+        },
+        {
+          "key": 5,
+          "heat": [
+            0,
+            0,
+            0,
+            1,
+            18,
+            81
+          ],
+          "de": {
+            "text": "Ausdruck entnehmen",
+            "description": "",
+            "thought": "Der Ausdruck liegt im Fach – endlich."
+          },
+          "en": {
+            "text": "Take out the printout",
+            "description": "",
+            "thought": "The printout's in the tray — finally."
+          }
+        }
+      ]
+    }
+  ]
+}

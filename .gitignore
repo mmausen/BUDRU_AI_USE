@@ -1,0 +1,9 @@
+# participant data: never commit (only logs/.gitignore is tracked)
+logs/**/*.json
+logs/**/*.jsonl
+logs/**/*.tmp
+
+node_modules/
+package-lock.json
+.DS_Store
+.claude/settings.local.json

@@ -1,0 +1,136 @@
+/* ═══════════════════════════════════════════════════════════════════
+   MAIN — boot: load the interface text, create the session, wire the
+   screens and the dev bar, then enter the flow.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── DEV BAR ─────────────────────────────────────────────────────────
+   Shown only with Config.CONFIG.devMode. Lets a researcher skip parts of
+   the run while building or piloting it:
+     Skip ▸     — the next step, from wherever you are (also mid-task)
+     Jump to    — any step directly: an interaction, a questionnaire, the end
+     Tasks      — the task set (placeholder / fixed / prio) and the task
+                  language (DE / EN); a running task is rebuilt with the new one.
+                  The choice is remembered in this browser across reloads.
+     Restart    — a fresh session from the first step
+   Shortcut: Shift + → is Skip. */
+window.Dev = (function () {
+  const $ = id => document.getElementById(id);
+
+  function fill() {
+    const sel = $("dev-jump");
+    sel.innerHTML = "";
+    Flow.all().forEach((s, i) => {
+      const opt = document.createElement("option");
+      opt.value = i;
+      opt.textContent = `${i + 1}. ${s.label}`;
+      sel.appendChild(opt);
+    });
+  }
+  function sync(i) { const sel = $("dev-jump"); if (sel) sel.value = i; }
+
+  function fillTasks() {
+    const sel = $("dev-taskset");
+    sel.innerHTML = "";
+    Tasks.SETS.filter(Tasks.has).forEach(name => {
+      const opt = document.createElement("option");
+      opt.value = name;
+      opt.textContent = "Tasks: " + name;
+      sel.appendChild(opt);
+    });
+    sel.value = Tasks.set();
+    $("dev-tasklang").value = Tasks.lang();
+  }
+  // Switch the task set / language; rebuild the task on screen so it shows at once.
+  function setTasks(set, lang) {
+    Tasks.choose(set, lang);
+    Store.setTasks(Tasks.set(), Tasks.lang(), "dev");
+    const cur = Flow.current();
+    if (cur && cur.type === "task") Flow.go(Flow.index());
+  }
+
+  function wire(restart) {
+    $("dev-bar").hidden = false;
+    fill();
+    fillTasks();
+    $("dev-taskset").addEventListener("change", e => setTasks(e.target.value, null));
+    $("dev-tasklang").addEventListener("change", e => setTasks(null, e.target.value));
+    $("dev-skip").addEventListener("click", () => Flow.next());
+    $("dev-jump").addEventListener("change", e => Flow.go(+e.target.value));
+    $("dev-restart").addEventListener("click", restart);
+    document.addEventListener("keydown", e => {
+      if (e.shiftKey && e.key === "ArrowRight") { e.preventDefault(); Flow.next(); }
+    });
+  }
+
+  return { wire, sync };
+})();
+
+(function () {
+  const $ = id => document.getElementById(id);
+
+  // Auto participant ID: 4 random letters + base36 timestamp. Names the log folder.
+  function genParticipantId() {
+    let letters = "";
+    for (let i = 0; i < 4; i++) letters += String.fromCharCode(65 + Math.floor(Math.random() * 26));
+    return letters + "-" + Date.now().toString(36);
+  }
+
+  function applyStaticText() {
+    document.querySelectorAll("[data-s]").forEach(el => { el.textContent = S.t(el.getAttribute("data-s")); });
+    $("anon-id-input").placeholder = S.t("ui.anonId.placeholder");
+  }
+
+  function startSession() {
+    Store.newSession(genParticipantId());
+    Store.setTasks(Tasks.set(), Tasks.lang(), Tasks.set() === Config.TASK_SET && Tasks.lang() === Config.TASK_LANG ? "config" : "dev");
+    Flow.build();
+    Flow.go(0);
+  }
+
+  /* The AI is embodied as a cursor in most interactions, so a device without
+     a precise pointer cannot run this study. Gate on input capability, not
+     screen width, so a desktop user with a small window is never blocked. */
+  function isUnsupportedDevice() {
+    if (!window.matchMedia) return false;
+    return window.matchMedia("(pointer: coarse)").matches || window.matchMedia("(hover: none)").matches;
+  }
+
+  function boot() {
+    if (Config.CONFIG.loggingEnabled === false) {
+      console.warn("[BDR] logging is OFF (Config.CONFIG.loggingEnabled = false) — nothing is sent to logs/.");
+    }
+    Tasks.init();
+    console.log(`[BDR] task set "${Tasks.set()}" (${Tasks.lang()})`);
+    Config.INTERACTIONS.forEach(k => {
+      if (!Interactions.get(k)) console.error(`[BDR] Config.INTERACTIONS names "${k}", but no module registered it.`);
+    });
+    Store.flushArchive().then(n => { if (n) console.log(`[BDR] uploaded ${n} archived session(s)`); });
+
+    applyStaticText();
+    Screens.wire();
+    Task.wire();
+
+    window.addEventListener("pagehide", () => Store.flush());
+    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") Store.flush(); });
+
+    if (isUnsupportedDevice()) { Flow.showScreen("screen-mobile"); return; }
+
+    startSession();
+    if (Config.CONFIG.devMode) Dev.wire(() => { Task.stop(); startSession(); });
+  }
+
+  // Load the interface text and the three task sets, then boot.
+  // (fetch needs http — serve with `npm start`, not file://.)
+  document.addEventListener("DOMContentLoaded", () => {
+    const grab = url => fetch(url, { cache: "no-cache" }).then(r => {
+      if (!r.ok) throw new Error(url + " → HTTP " + r.status);
+      return r.json();
+    });
+    const loads = [
+      grab("strings.json").then(S.load).catch(err => { console.error("Failed to load strings.json:", err); S.load({}); }),
+      ...Tasks.SETS.map(name => grab(`tasks/${name}.json`).then(json => Tasks.load(name, json))
+        .catch(err => console.error(`Failed to load tasks/${name}.json:`, err))),
+    ];
+    Promise.all(loads).finally(boot);
+  });
+})();

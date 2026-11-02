@@ -1,0 +1,114 @@
+{
+  "ui": {
+    "brand": "BDR · AI Use",
+    "mobile": {
+      "heading": "Please use a desktop computer",
+      "body": "This study is about working together with an AI using a mouse or trackpad. It cannot run on a phone or tablet.",
+      "hint": "Open this link on a computer to take part."
+    },
+    "anonId": {
+      "heading": "Participant ID",
+      "body": "Please enter the participant ID the research team gave you.",
+      "label": "Participant ID",
+      "placeholder": "e.g. P-0123",
+      "required": "Please enter your participant ID to continue.",
+      "next": "Continue"
+    },
+    "survey": {
+      "continue": "Continue",
+      "required": "Please answer all required questions.",
+      "likertLow": "Strongly disagree",
+      "likertHigh": "Strongly agree"
+    },
+    "task": {
+      "brief": "Rank the six items by urgency — most urgent at the top.",
+      "inbox": "Inbox — incoming items",
+      "remaining": "{n} remaining",
+      "ladder": "Urgency ranking — drag items here",
+      "allPlaced": "All items placed.",
+      "mostUrgent": "Most urgent",
+      "leastUrgent": "Least urgent",
+      "confirm": "Confirm ranking",
+      "progress": "AI interaction {n} of {total}",
+      "start": "Start",
+      "info": "How does this work?"
+    },
+    "end": {
+      "title": "Thank you for participating!",
+      "note": "Your session is complete. You can now close this window."
+    }
+  },
+
+  "interactions": {
+    "hint": {
+      "badge": "Hint",
+      "title": "The AI shows you a hint",
+      "intro": "When you pick up a card, the AI highlights the slot it suggests for that card. It only hints — you decide where every card lands.",
+      "footer": "Pick up a card to see the AI's suggestion."
+    },
+    "magnet": {
+      "badge": "Magnet",
+      "title": "The AI pulls your cards",
+      "intro": "Pick up a card and move it into the ranking. When the card comes near the slot the AI suggests, the AI pulls it toward that slot. You can always place it somewhere else: just keep moving the card where you want it.",
+      "footer": "Near its suggested slot, the AI pulls the card in. Keep moving to place it elsewhere."
+    },
+    "radial": {
+      "badge": "Options",
+      "title": "The AI offers two options",
+      "intro": "Rest the pointer on a card in the inbox and the AI opens two placement options beside it. Hover an option to preview it, click to place the card. Or ignore the options and drag the card yourself.",
+      "footer": "The AI proposes two slots — pick one, or drag the card yourself."
+    },
+    "heatmap": {
+      "badge": "Heatmap",
+      "title": "The AI shows how likely each slot is",
+      "intro": "Hover a card and every slot in the ranking lights up on a hot-to-cold scale: red is where the AI thinks the card most likely belongs, blue is unlikely. It is only a suggestion — you place every card by hand.",
+      "footer": "Cold",
+      "footerHot": "Hot = most likely"
+    },
+    "handoff": {
+      "badge": "Handoff",
+      "title": "The AI takes over when you pause",
+      "intro": "Drag cards into the ranking. When you stop moving, the AI takes the cursor and continues sorting. Move the mouse again at any time to take back control.",
+      "footer": "Pause to let the AI continue — move the mouse to take back control.",
+      "you": "You're in control",
+      "ai": "AI is sorting"
+    },
+    "override": {
+      "badge": "Override",
+      "title": "Sort first — then the AI reviews",
+      "intro": "First, rank all six items yourself. When you are done, hand your ranking to the AI. The AI will review it and change what it disagrees with.",
+      "handOver": "Hand over to the AI",
+      "sortFirst": "Rank all six items, then hand them over to the AI.",
+      "working": "The AI is reviewing your ranking…",
+      "done": "The AI changed {n} of your placements.",
+      "doneEdit": "The AI changed {n} of your placements. You can still adjust the ranking before confirming."
+    }
+  },
+
+  "surveys": {
+    "pre": {
+      "kicker": "Before we start",
+      "title": "Pre-questionnaire (placeholder)",
+      "questions": [
+        { "id": "pre_q1", "type": "likert", "label": "Placeholder: I trust AI systems in general.", "required": false },
+        { "id": "pre_q2", "type": "text",   "label": "Placeholder: Any experience with AI tools?", "required": false }
+      ]
+    },
+    "mid": {
+      "kicker": "About the interaction you just used",
+      "title": "Mid-questionnaire (placeholder)",
+      "questions": [
+        { "id": "mid_q1", "type": "likert", "label": "Placeholder: I felt in control during this task.", "required": false },
+        { "id": "mid_q2", "type": "likert", "label": "Placeholder: I trusted the AI's suggestions.", "required": false }
+      ]
+    },
+    "final": {
+      "kicker": "Almost done",
+      "title": "Final screener (placeholder)",
+      "questions": [
+        { "id": "final_q1", "type": "likert", "label": "Placeholder: Overall, working with the AI was pleasant.", "required": false },
+        { "id": "final_q2", "type": "text",   "label": "Placeholder: Which interaction did you prefer, and why?", "required": false }
+      ]
+    }
+  }
+}
