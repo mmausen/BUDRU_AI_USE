@@ -11,7 +11,7 @@ Interactions.register("handoff", {
   mount(container, ctx) {
     const CFG = {
       idleMs: 1000,      // ms of no input before the AI takes over
-      speed: 28,         // 0–100 → travel speed
+      speed: 10,         // 0–100 → travel speed (10 ≈ 527 px/s, half the original 28 ≈ 1062 px/s)
       hesitate: true,    // thinking pauses + second-guess approaches
       speedMin: 230, speedMax: 3200,   // px/s at speed 0 / 100
       fadeInMs: 500, fadeOutMs: 220,
@@ -92,7 +92,8 @@ Interactions.register("handoff", {
     }
 
     /* ── activity / hand-off ── */
-    const inTune = e => !!(e.target && e.target.closest && e.target.closest(".t-tune"));
+    // Dev controls (the dev bar and its Params panel) never count as taking back control.
+    const inTune = e => !!(e.target && e.target.closest && e.target.closest("#dev-tune, #dev-bar"));
     function registerActivity(e) {
       lastActivity = performance.now();
       if (e && e.clientX != null) lastPointer = { x: e.clientX, y: e.clientY };

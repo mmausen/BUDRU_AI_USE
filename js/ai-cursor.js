@@ -6,7 +6,7 @@
 window.AiCursor = (function () {
   const SVG =
     '<svg viewBox="0 0 26 30" width="26" height="30"><path d="M2 2 L2 22 L8 17 L12 25 L15.5 23.5 L11.5 15.5 L19 15.5 Z" ' +
-    'fill="#fff" stroke="#1d1d1f" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+    'fill="#6d28d9" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg>';   // purple = AI (see styles.css)
 
   function pulse(el) {
     if (!el) return;

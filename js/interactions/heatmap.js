@@ -14,11 +14,12 @@ Interactions.register("heatmap", {
       showPct: true,    // numeric probability badge per slot
     };
 
-    // 3 stops (blue → pale grey → red): every slot reads as cold / neutral / hot.
+    // One purple ramp (AI colour, see styles.css): unlikely slots stay near
+    // white, the most likely one is full AI purple.
     const STOPS = [
-      { t: 0.00, c: [40, 90, 200] },
-      { t: 0.50, c: [235, 235, 233] },
-      { t: 1.00, c: [205, 46, 46] },
+      { t: 0.00, c: [250, 250, 250] },
+      { t: 0.50, c: [196, 181, 253] },
+      { t: 1.00, c: [109, 40, 217] },
     ];
     function colorForT(t) {
       t = Math.max(0, Math.min(1, t));
@@ -60,7 +61,9 @@ Interactions.register("heatmap", {
         const pctEl = s.querySelector(".t-slot-pct");
         s.querySelector(".t-slot-heat").style.background = `rgba(${color.join(",")},${CFG.opacity})`;
         pctEl.textContent = CFG.showPct ? Math.round(h.pct[i]) + "%" : "";
-        pctEl.style.color = luminance(color) > 150 ? "#0a0a0a" : "#fff";
+        // Judge contrast on the colour actually shown (the overlay is translucent over white).
+        const shown = color.map(v => v * CFG.opacity + 255 * (1 - CFG.opacity));
+        pctEl.style.color = luminance(shown) > 150 ? "#2e1065" : "#fff";
         s.classList.add("heat-active");
         s.classList.toggle("best", i === maxIdx);
       });

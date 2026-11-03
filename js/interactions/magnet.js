@@ -9,17 +9,24 @@
 
    The field is circular: within `magnetRadius` of the target the tile is
    moved `magnetStrength` of the way there (peak < 1, so it can be overridden).
+   With `snap` (on by default) the inner part — `snapThreshold` × radius — pulls
+   the tile fully onto the slot; leaving that zone releases it again.
+   The radius is set in SLOT HEIGHTS (`radiusSlots`) and converted to px at
+   every pick-up from the height the dragged card's slot will have — the card
+   itself plus the slot margins, never below the empty slot — so the field
+   covers the same share of the ranking whatever the card size, task set or
+   window width (narrow windows wrap the text and make cards taller).
    ═══════════════════════════════════════════════════════════════════ */
 Interactions.register("magnet", {
   mount(container, ctx) {
     const CFG = {
-      magnetRadius: 90,     // px tile-right-edge → slot-right-edge (recomputed responsively)
-      magnetStrength: 0.58, // 0–1 displacement toward the magnet (peak < 1 → overridable)
+      radiusSlots: 2.2,     // field radius in slot heights (2.2 × 72 px ≈ the former fixed 160 px)
+      magnetRadius: 160,    // px, derived from radiusSlots × the slot height (see computeRadius)
+      magnetStrength: 0.24, // 0–1 displacement toward the magnet (peak < 1 → overridable)
       springK: 0.22,        // spring stiffness
       damping: 0.62,        // velocity damping per frame
-      snap: false,          // hard-snap to the slot when very close
+      snap: true,           // hard-snap to the slot when very close
       snapThreshold: 0.55,  // fraction of radius at which snap kicks in
-      radiusBase: 90, radiusRefH: 900, radiusMin: 160, radiusMax: 560,
     };
     const CARD_MARGIN_R = 10;   // px: the placed card's right margin — the tile's right edge snaps here
     const CURSOR_SVG =
@@ -27,7 +34,7 @@ Interactions.register("magnet", {
       '<path d="M2 1.5 L2 20.5 L7 15.6 L10.3 22.8 L13.2 21.5 L10 14.4 L17.2 14.4 Z" fill="#000" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg>';
 
     const real = { x: 0, y: 0 }, fake = { x: 0, y: 0 }, vel = { x: 0, y: 0 };
-    let cursorActive = false, rafId = null, lastTick = 0, radiusAuto = true;
+    let cursorActive = false, rafId = null, lastTick = 0, slotH = 72;
     let drag = null;
 
     const b = Board.create(container, {
@@ -36,8 +43,8 @@ Interactions.register("magnet", {
       drag: false,                       // this module drives its own drag
       footerLeft: '<span class="t-note"></span>',
       tune:
-        range("Strength", "magnetStrength", 0, 1, 0.02) + range("Radius", "magnetRadius", 0, 600, 5) +
-        '<label class="opt"><input type="checkbox" class="tune-snap"> Snap</label>' +
+        range("Strength", "magnetStrength", 0, 1, 0.02) + range("Radius (slots)", "radiusSlots", 0, 6, 0.1) +
+        '<label class="opt"><input type="checkbox" class="tune-snap"' + (CFG.snap ? " checked" : "") + '> Snap</label>' +
         range("Spring", "springK", 0.05, 0.6, 0.01) +
         '<span class="tune-readout"></span>',
       cardDecor(div) { div.addEventListener("mousedown", onMouseDown); },
@@ -56,7 +63,7 @@ Interactions.register("magnet", {
     if (t(".tune-snap")) {
       b.$$("[data-cfg]").forEach(el => el.addEventListener("input", () => {
         CFG[el.dataset.cfg] = +el.value;
-        if (el.dataset.cfg === "magnetRadius") radiusAuto = false;
+        computeRadius();
         readout();
       }));
       t(".tune-snap").addEventListener("change", e => { CFG.snap = e.target.checked; });
@@ -64,7 +71,7 @@ Interactions.register("magnet", {
     function readout() {
       const el = t(".tune-readout");
       if (!el) return;
-      el.textContent = `strength ${CFG.magnetStrength} · radius ${CFG.magnetRadius}`;
+      el.textContent = `strength ${CFG.magnetStrength} · radius ${CFG.radiusSlots} slots = ${CFG.magnetRadius}px (slot ${slotH}px)`;
     }
 
     /* ── magnet geometry ── */
@@ -117,12 +124,14 @@ Interactions.register("magnet", {
       fxCanvas.style.height = r.height + "px";
       fxCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
+    // Radius in px = radiusSlots × the slot height. An empty slot is 72 px (CSS
+    // min-height); a filled one grows to its card + margins. So while dragging, the
+    // unit is the slot this card will fill: its own height + SLOT_MARGIN_Y.
+    const SLOT_MIN_H = 72, SLOT_MARGIN_Y = 18;   // keep in sync with .t-slot / .t-slot .card in styles.css
     function computeRadius() {
-      if (!radiusAuto) return;
-      const h = window.innerHeight || CFG.radiusRefH;
-      CFG.magnetRadius = Math.round(Math.max(CFG.radiusMin, Math.min(CFG.radiusMax, CFG.radiusBase * h / CFG.radiusRefH)));
-      const el = t('[data-cfg="magnetRadius"]');
-      if (el) el.value = CFG.magnetRadius;
+      const card = drag && drag.srcH ? drag.srcH + SLOT_MARGIN_Y : 0;
+      slotH = Math.round(Math.max(SLOT_MIN_H, card || slotH));
+      CFG.magnetRadius = Math.round(CFG.radiusSlots * slotH);
     }
 
     /* ── spring loop ── */
@@ -159,7 +168,7 @@ Interactions.register("magnet", {
       fxCtx.setLineDash([3, 5]);
       fxCtx.moveTo(snap.x - tr.left, snap.y - tr.top);
       fxCtx.lineTo(fake.x - tr.left, fake.y - tr.top);
-      fxCtx.strokeStyle = "rgba(21,127,59," + (0.45 * k) + ")";
+      fxCtx.strokeStyle = "rgba(109,40,217," + (0.55 * k) + ")";   // AI purple
       fxCtx.lineWidth = 1;
       fxCtx.stroke();
       fxCtx.restore();
@@ -194,6 +203,8 @@ Interactions.register("magnet", {
     }
     function startDrag() {
       drag.started = true;
+      computeRadius();          // slot heights may have changed since the last pick-up
+      readout();
       drag.anchorOffX = (drag.srcW || 280) - drag.offsetX;   // the tile's right edge…
       drag.anchorOffY = (drag.srcH || 72) / 2 - drag.offsetY; // …vertically centred
       b.ghost.show(drag.id, drag.srcW);
@@ -218,7 +229,7 @@ Interactions.register("magnet", {
 
     b.listen(document, "mousemove", onMove);
     b.listen(document, "mouseup", onMouseUp);
-    b.listen(window, "resize", () => { sizeCanvas(); computeRadius(); });
+    b.listen(window, "resize", () => { sizeCanvas(); computeRadius(); readout(); });
     b.onDestroy(() => { if (rafId) cancelAnimationFrame(rafId); });
 
     b.render();

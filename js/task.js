@@ -30,7 +30,8 @@ window.Task = (function () {
     board = mod.mount($("task-host"), {
       task: Tasks.forRound(s.n),
       onConfirm: confirm,
-      paused: () => explainerOpen,
+      // Paused while the intro card is open or an AI thought is being read.
+      paused: () => explainerOpen || !!(board && board.thoughtOpen),
     });
     const info = board.$(".t-info");
     if (info) info.addEventListener("click", openExplainer);
@@ -47,7 +48,8 @@ window.Task = (function () {
   function openExplainer() {
     if (!step) return;
     $("explainer-title").textContent = S.t(`interactions.${step.interaction}.title`);
-    $("explainer-body").textContent = S.t(`interactions.${step.interaction}.intro`);
+    $("explainer-body").textContent = S.t(`interactions.${step.interaction}.intro`) +
+      (Config.THOUGHTS.enabled ? " " + S.t("ui.task.thoughtIntro") : "");
     $("explainer-ok").textContent = S.t("ui.task.start");
     $("explainer").hidden = false;
     $("screen-task").classList.add("paused");

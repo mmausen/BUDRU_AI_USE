@@ -49,11 +49,28 @@ window.Config = (function () {
        "fixed"       — process sequences with ONE correct order (6 tasks)
        "prio"        — prioritisation with a preferred order that leaves
                        room for interpretation (6 tasks)
-     Interaction n runs task n of the set. The AI recommends each task's
-     `target-order`; the heatmap shows each tile's `heat` row.
-     In devMode the dev bar's picker overrides both settings. */
+     The AI recommends each task's `target-order`; the heatmap shows each
+     tile's `heat` row. In devMode the dev bar's picker overrides both settings. */
   const TASK_SET = "placeholder";
   const TASK_LANG = "en";          // task content language: "de" | "en"
+
+  /* Which task each interaction gets.
+       false — interaction n runs task n of the set (same for everyone)
+       true  — a fresh random assignment per session: every interaction gets a
+               different task (as long as the set has enough), so task
+               difficulty no longer travels with one interaction.
+     The assignment is stored in the session as `taskOrder` (task ids, in
+     interaction order). The placeholder set has one task, so it changes nothing there. */
+  const RANDOM_TASK_ASSIGNMENT = true;
+
+  /* AI THOUGHTS — the AI's reasoning for each tile (the `thought` in tasks/*.json).
+     When enabled, every card carries a small "AI" chip; hovering it opens a
+     bubble with the thought. Same in all six interactions. Reading a thought
+     pauses the handoff AI, so it never takes over while someone reads. */
+  const THOUGHTS = {
+    enabled: true,
+    openDelayMs: 150,              // hover this long on the chip before the bubble opens
+  };
 
   /* Interaction 6 — OVERRIDE. The AI always changes at least this many of the
      participant's tiles, even when the participant's order already matches
@@ -66,5 +83,6 @@ window.Config = (function () {
   // Where Store.sendRemote() posts the session. "" → localStorage only.
   const ENDPOINT_URL = "/collect-logs";
 
-  return { CONFIG, STEPS, INTERACTIONS, TASK_SET, TASK_LANG, OVERRIDE, ENDPOINT_URL };
+  return { CONFIG, STEPS, INTERACTIONS, TASK_SET, TASK_LANG, RANDOM_TASK_ASSIGNMENT, THOUGHTS,
+           OVERRIDE, ENDPOINT_URL };
 })();

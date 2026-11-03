@@ -36,6 +36,7 @@ window.Store = (function () {
       taskSet: null,                      // placeholder | fixed | prio (see setTasks)
       taskLang: null,
       taskSource: null,                   // "config" | "dev" (picked in the dev bar)
+      taskOrder: [],                      // task id per interaction, in interaction order
       startedAt: new Date().toISOString(),
       currentStep: 0,
       surveys: {},
@@ -56,6 +57,7 @@ window.Store = (function () {
     data.taskSet = set; data.taskLang = lang; data.taskSource = source || data.taskSource;
     save();
   }
+  function setTaskOrder(ids) { if (data) { data.taskOrder = ids.slice(); save(); } }
 
   /* ── the logging API (not called anywhere yet) ── */
   function log(type, payload) {
@@ -162,7 +164,7 @@ window.Store = (function () {
 
   return {
     SCHEMA_VERSION,
-    newSession, get, setStep, setAnonId, anonId, setTasks,
+    newSession, get, setStep, setAnonId, anonId, setTasks, setTaskOrder,
     log, addResult, setSurvey, markComplete,
     load, download, sendRemote, flush, archive, flushArchive,
   };

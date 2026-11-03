@@ -1,4 +1,4 @@
-# BDR — AI Use Prototype
+# DFKI · AI Use Prototype
 
 A lighter successor of [designing-trust-pt](https://github.com/mmausen/designing-trust-pt).
 The focus moves from observability to **AI interaction paradigms**: every participant
@@ -25,7 +25,7 @@ Each interaction opens with a short intro card; the ⓘ button in its banner reo
 
 ## Task sets
 
-Three interchangeable task sets live in `tasks/`. All three use the same schema. Interaction *n* runs task *n* of the active set.
+Three interchangeable task sets live in `tasks/`. All three use the same schema.
 
 | Set | File | Content |
 |---|---|---|
@@ -53,7 +53,7 @@ Each file has the same schema:
 ```
 
 - Structure (`key`, `target-order`, `heat`) is shared; prose is per language.
-- `thought` is the AI's first-person reasoning for a tile's place. It is not shown yet.
+- `thought` is the AI's first-person reasoning for a tile's place. It is shown when thoughts are on (see below).
 - **`heat`** is a falloff around each tile's target slot. Each row sums to 100, and each slot column to about 100.
   - **fixed**: sharp (about 65–80% on the target slot).
   - **prio**: wider. Where a case has a competing reading, there is a second bump. Example: a "within the hour" case pulled toward the top by a deadline-first reading. The target slot is always the most likely one.
@@ -61,16 +61,37 @@ Each file has the same schema:
 
 Set the default with `Config.TASK_SET` and `Config.TASK_LANG`. In devMode, the dev bar's **Tasks** and **EN/DE** pickers switch both live. The task on screen is rebuilt, and the browser remembers the choice. Each session records `taskSet`, `taskLang` and `taskSource` (`config` or `dev`). Interface text outside the task content (buttons, "remaining", the heatmap legend) is still English only.
 
+### Which task each interaction gets
+
+`Config.RANDOM_TASK_ASSIGNMENT` decides:
+
+- `false`: interaction *n* runs task *n* of the set, the same for everyone.
+- `true` (default): every session draws a fresh random assignment. Each interaction gets a different task while the set has enough of them, so a task's difficulty no longer travels with one interaction.
+
+The assignment is stored in the session as `taskOrder` (task ids in interaction order) and logged to the console. Switching the task set in the dev bar draws a new one. The placeholder set has one task, so the switch changes nothing there.
+
+## AI thoughts
+
+With `Config.THOUGHTS.enabled`, every card carries a small purple speech-bubble chip. Hovering it (after `openDelayMs`) opens a bubble with the tile's `thought`, the AI's reasoning. It works the same in all six interactions:
+
+- The intro card gets one extra sentence pointing to the chips.
+- Pressing the chip never starts a drag.
+- While a thought is open, the handoff AI does not take over.
+
+Set `enabled: false` to remove the chips entirely. Opening a thought is not logged yet; the hook is marked in `js/board.js`.
+
 ## The six interactions
+
+**Purple means AI, and only AI.** Everything the AI shows, says or does is one purple (`--ai` in `styles.css`): suggested slots, radial options, heat, thoughts, the AI cursor, the handoff "AI" pill, AI-moved cards and the interaction badge. The participant's own actions (drop targets, Confirm) stay neutral grey or black.
 
 The AI recommends the active task's `target-order`.
 
 | # | Key | Source | What happens |
 |---|---|---|---|
 | 1 | `hint` | lab_01 | Pick up a card → the AI highlights the slot it suggests. It never moves anything. |
-| 2 | `magnet` | lab_02 | A spring-driven fake cursor. Within a circular radius of the AI's slot, the dragged card is pulled part of the way toward it, so you can still overrule it. |
+| 2 | `magnet` | lab_02 | A spring-driven fake cursor. Within a circular radius of the AI's slot, the dragged card is pulled part of the way toward it (strength 0.24), so you can still overrule it. The radius is 2.2 slot heights, measured live, so the field feels the same at any card size or window size. |
 | 3 | `radial` | lab_03 | Rest on an inbox card → two slot options appear: the AI's slot and a decoy, in random order. |
-| 4 | `heatmap` | lab_04 | Hover a card → every slot glows hot→cold by how likely the AI thinks it belongs there. |
+| 4 | `heatmap` | lab_04 | Hover a card → every slot glows from white to deep purple by how likely the AI thinks it belongs there. |
 | 5 | `handoff` | lab_05 | Stop moving for 1 s and the AI takes the cursor and keeps sorting. Move to take back control. |
 | 6 | `override` | **new** | You sort all six alone, then hand over. The AI moves every tile it disagrees with. |
 
@@ -91,13 +112,17 @@ npm start       # → http://localhost:8080
 ## Configuring (`js/config.js`)
 
 - `INTERACTIONS` — an array, and its order is the running order. Remove an entry to drop that interaction.
+- `RANDOM_TASK_ASSIGNMENT` — random task per interaction, per session (see Task sets).
+- `THOUGHTS` — `enabled` shows the AI's reasoning on each card; `openDelayMs` is the hover delay.
 - `STEPS` — switches `anonId`, `preSurvey`, `midSurvey` and `finalSurvey` on or off.
 - `CONFIG.devMode` — the dev bar, top-right:
   - **Skip ▸**, or Shift + →, goes to the next step, even mid-task.
   - **Jump to** goes straight to any step.
   - **Restart** starts a fresh session.
 
-  devMode also shows each interaction's tuning controls (dashed yellow box in the footer).
+  - **Params** shows or hides the running interaction's tuning controls in a panel under the bar: magnet strength, radius and spring, handoff speed and hesitation, heatmap opacity, the hint switch. The browser remembers whether it is open. Changes last until the task is rebuilt; defaults are in each module's `CFG`.
+
+  None of this exists without devMode.
   **It must be `false` for participants.**
 - `CONFIG.loggingEnabled` — the master switch for the collector (see below).
 
@@ -114,7 +139,7 @@ The logging pipeline from designing-trust-pt is in place, but **no study data is
   address is ever recorded.
 
 The session currently holds only its identity: the auto-generated `participantId`, the
-typed `anonId`, the step switches and the interaction order. Nothing calls `Store.log()`,
+typed `anonId`, the step switches, the interaction order and the task assignment (`taskOrder`). Nothing calls `Store.log()`,
 `Store.addResult()` or `Store.setSurvey()` yet. The hook points are marked in `js/task.js`
 (`confirm`) and `js/screens.js` (`submitSurvey`).
 

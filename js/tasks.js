@@ -41,12 +41,32 @@ window.Tasks = (function () {
     writeDev({ set, lang });
   }
 
-  /* The task for AI interaction n (1-based). One task per interaction; a set
-     with fewer tasks than interactions wraps around (the placeholder set has one). */
+  const shuffle = a => {
+    a = a.slice();
+    for (let i = a.length - 1; i > 0; i--) { const j = 0 | (Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+    return a;
+  };
+
+  /* Which task each of `rounds` interactions runs, as task ids in interaction
+     order. In order by default; shuffled with Config.RANDOM_TASK_ASSIGNMENT.
+     A set with fewer tasks than interactions is used up before any task repeats
+     (the placeholder set has one, so every round gets it). */
+  function assign(rounds) {
+    const ids = ((data[set] && data[set].tasks) || []).map(t => t.id);
+    if (!ids.length) return [];
+    const out = [];
+    while (out.length < rounds) out.push(...(Config.RANDOM_TASK_ASSIGNMENT ? shuffle(ids) : ids));
+    return out.slice(0, rounds);
+  }
+
+  /* The task for AI interaction n (1-based): the session's assignment if it
+     names a task of the active set, otherwise task n (wrapping around). */
   function forRound(n) {
     const tasks = (data[set] && data[set].tasks) || [];
     if (!tasks.length) return null;
-    return flatten(tasks[(n - 1) % tasks.length]);
+    const sess = window.Store && Store.get();
+    const id = sess && sess.taskOrder ? sess.taskOrder[n - 1] : null;
+    return flatten(tasks.find(t => t.id === id) || tasks[(n - 1) % tasks.length]);
   }
 
   function flatten(t) {
@@ -72,6 +92,6 @@ window.Tasks = (function () {
     };
   }
 
-  return { SETS, load, init, choose, forRound,
+  return { SETS, load, init, choose, assign, forRound,
            set: () => set, lang: () => lang, has: name => !!data[name] };
 })();

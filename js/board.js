@@ -10,7 +10,7 @@
        task:       Tasks.forRound(n),   // tiles, labels, the AI's target order, heat
        drag:       true,                // default mouse drag (false → module drives its own)
        footerLeft: el | html,           // left side of the footer
-       tune:       html,                // dev-only tuning controls (shown in devMode)
+       tune:       html,                // dev-only tuning controls → the dev bar's Params panel (devMode only)
        bannerRight:html,                // e.g. the handoff "who's in control" pill
        slotDecor(slotEl, i), cardDecor(cardEl, card, from),
        onDragStart(d), onDragMove(d, e), onDragEnd(d),
@@ -64,16 +64,20 @@ window.Board = (function () {
       '</div>' +
       '<div class="t-footer">' +
         '<div class="t-footer-left"></div>' +
-        (Config.CONFIG.devMode && opts.tune ? '<div class="t-tune" title="Dev only — hidden when devMode is off">' + opts.tune + '</div>' : "") +
         '<button type="button" class="t-btn t-primary t-confirm" disabled></button>' +
       '</div>' +
-      '<div class="t-ghost"><div class="card-icon"></div><div><div class="card-title"></div><div class="card-detail"></div></div></div>';
+      '<div class="t-ghost"><div class="card-icon"></div><div><div class="card-title"></div><div class="card-detail"></div></div></div>' +
+      '<div class="t-thought" role="tooltip" hidden><div class="t-thought-hd"></div><div class="t-thought-txt"></div></div>';
     container.appendChild(root);
 
     const q = sel => root.querySelector(sel);
     b.root = root;
-    b.$ = q;
-    b.$$ = sel => root.querySelectorAll(sel);
+    // The tuning controls live in the dev bar's Params panel, outside the board,
+    // so b.$ / b.$$ search both: modules find their .tune-* inputs as before.
+    const tuneEl = Config.CONFIG.devMode && opts.tune && window.Dev ? Dev.mountTune(opts.key, opts.tune) : null;
+    if (tuneEl) cleanups.push(() => Dev.unmountTune(tuneEl));
+    b.$ = sel => q(sel) || (tuneEl && tuneEl.querySelector(sel));
+    b.$$ = sel => [...root.querySelectorAll(sel), ...(tuneEl ? tuneEl.querySelectorAll(sel) : [])];
 
     q(".b-badge").textContent = S.t(`interactions.${opts.key}.badge`);
     const L = task.labels || {};
@@ -96,6 +100,7 @@ window.Board = (function () {
 
     /* ── render ── */
     function render() {
+      closeThought();          // its chip is about to be replaced
       inboxEl.innerHTML = "";
       if (!b.inbox.length) {
         const n = document.createElement("div");
@@ -144,6 +149,7 @@ window.Board = (function () {
       div.innerHTML = '<div class="card-icon"></div><div class="card-txt"><div class="card-title"></div>' +
                       '<div class="card-detail"></div></div><div class="card-grip">⠿</div>';
       fillCard(div, card);
+      if (Config.THOUGHTS.enabled && card.thought) addThoughtChip(div, card);
       if (opts.drag !== false) div.addEventListener("mousedown", onMouseDown);
       if (opts.cardDecor) opts.cardDecor(div, card, from);
       return div;
@@ -157,6 +163,51 @@ window.Board = (function () {
       el.querySelector(".card-detail").textContent = card.detail || "";
       el.querySelector(".card-detail").hidden = !card.detail;
     }
+
+    /* ── AI thoughts (Config.THOUGHTS) ──
+       A chip on each card; hovering it opens a bubble with the tile's `thought`.
+       b.thoughtOpen tells the interactions someone is reading (handoff pauses). */
+    const thoughtEl = q(".t-thought");
+    const THOUGHT_SVG = '<svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 2.5h10a1.5 1.5 0 0 1 1.5 1.5v6A1.5 1.5 0 0 1 13 11.5H7.5L4.5 14v-2.5H3A1.5 1.5 0 0 1 1.5 10V4A1.5 1.5 0 0 1 3 2.5z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><circle cx="5.3" cy="7" r=".95" fill="currentColor"/><circle cx="8" cy="7" r=".95" fill="currentColor"/><circle cx="10.7" cy="7" r=".95" fill="currentColor"/></svg>';
+    let thoughtTimer = null;
+    b.thoughtOpen = false;
+    function addThoughtChip(div, card) {
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "card-thought";
+      chip.title = "";
+      chip.setAttribute("aria-label", S.t("ui.task.thought"));
+      chip.innerHTML = THOUGHT_SVG;
+      chip.addEventListener("mouseenter", () => {
+        clearTimeout(thoughtTimer);
+        thoughtTimer = setTimeout(() => openThought(chip, card), Config.THOUGHTS.openDelayMs || 0);
+      });
+      chip.addEventListener("mouseleave", closeThought);
+      chip.addEventListener("mousedown", e => e.stopPropagation());   // the chip is for reading, not dragging
+      div.insertBefore(chip, div.querySelector(".card-grip"));
+    }
+    function openThought(chip, card) {
+      if (b.drag || !chip.isConnected) return;
+      thoughtEl.querySelector(".t-thought-hd").textContent = S.t("ui.task.thought");
+      thoughtEl.querySelector(".t-thought-txt").textContent = card.thought;
+      thoughtEl.hidden = false;
+      // Below the chip, right-aligned to it; flipped above when there is no room.
+      const r = chip.getBoundingClientRect(), w = thoughtEl.offsetWidth, h = thoughtEl.offsetHeight;
+      const x = Math.max(8, Math.min(window.innerWidth - w - 8, r.right - w + 10));
+      const y = r.bottom + 8 + h > window.innerHeight - 8 ? r.top - 8 - h : r.bottom + 8;
+      thoughtEl.style.left = x + "px";
+      thoughtEl.style.top = y + "px";
+      b.thoughtOpen = true;
+      // Not logged yet. Hook: Store.log("thought", { interaction: opts.key, tile: card.id });
+    }
+    function closeThought() {
+      clearTimeout(thoughtTimer);
+      thoughtEl.hidden = true;
+      b.thoughtOpen = false;
+    }
+    cleanups.push(() => clearTimeout(thoughtTimer));
+    // Any press outside a chip (picking up a card included) closes the bubble.
+    root.addEventListener("mousedown", e => { if (!e.target.closest(".card-thought")) closeThought(); }, true);
 
     /* ── state ── */
     // Place `id` (from the inbox or slot `from`) into slot `toSlot`. An occupant

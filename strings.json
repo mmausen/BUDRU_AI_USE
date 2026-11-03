@@ -1,6 +1,6 @@
 {
   "ui": {
-    "brand": "BDR · AI Use",
+    "brand": "DFKI · AI Use",
     "mobile": {
       "heading": "Please use a desktop computer",
       "body": "This study is about working together with an AI using a mouse or trackpad. It cannot run on a phone or tablet.",
@@ -31,7 +31,9 @@
       "confirm": "Confirm ranking",
       "progress": "AI interaction {n} of {total}",
       "start": "Start",
-      "info": "How does this work?"
+      "info": "How does this work?",
+      "thought": "The AI's reasoning",
+      "thoughtIntro": "Hover the speech bubble on a card to read the AI's reasoning for it."
     },
     "end": {
       "title": "Thank you for participating!",
@@ -61,9 +63,9 @@
     "heatmap": {
       "badge": "Heatmap",
       "title": "The AI shows how likely each slot is",
-      "intro": "Hover a card and every slot in the ranking lights up on a hot-to-cold scale: red is where the AI thinks the card most likely belongs, blue is unlikely. It is only a suggestion — you place every card by hand.",
-      "footer": "Cold",
-      "footerHot": "Hot = most likely"
+      "intro": "Hover a card and every slot in the ranking lights up in purple: the deeper the purple, the more likely the AI thinks the card belongs there. It is only a suggestion — you place every card by hand.",
+      "footer": "Less likely",
+      "footerHot": "More likely"
     },
     "handoff": {
       "badge": "Handoff",

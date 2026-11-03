@@ -3,6 +3,14 @@
    screens and the dev bar, then enter the flow.
    ═══════════════════════════════════════════════════════════════════ */
 
+// A fresh task-to-interaction assignment for this session (see Config.RANDOM_TASK_ASSIGNMENT).
+// Used at session start and by the dev bar when the task set changes.
+function assignTasks() {
+  const order = Tasks.assign(Config.INTERACTIONS.length);
+  Store.setTaskOrder(order);
+  console.log("[BDR] tasks per interaction: " + Config.INTERACTIONS.map((k, i) => `${k}→${order[i]}`).join(", "));
+}
+
 /* ── DEV BAR ─────────────────────────────────────────────────────────
    Shown only with Config.CONFIG.devMode. Lets a researcher skip parts of
    the run while building or piloting it:
@@ -12,6 +20,10 @@
                   language (DE / EN); a running task is rebuilt with the new one.
                   The choice is remembered in this browser across reloads.
      Restart    — a fresh session from the first step
+     Params     — shows / hides the running interaction's tuning controls
+                  (magnet strength and radius, handoff speed, …) in a panel
+                  under the bar. Remembered in this browser. Greyed out when
+                  the current step has none.
    Shortcut: Shift + → is Skip. */
 window.Dev = (function () {
   const $ = id => document.getElementById(id);
@@ -42,10 +54,36 @@ window.Dev = (function () {
   }
   // Switch the task set / language; rebuild the task on screen so it shows at once.
   function setTasks(set, lang) {
+    const before = Tasks.set();
     Tasks.choose(set, lang);
     Store.setTasks(Tasks.set(), Tasks.lang(), "dev");
+    if (Tasks.set() !== before) assignTasks();   // the old ids belong to the old set
     const cur = Flow.current();
     if (cur && cur.type === "task") Flow.go(Flow.index());
+  }
+
+  /* ── Params panel: Board.create() mounts an interaction's `tune` html here ── */
+  const PARAMS_KEY = "bdr_aiuse_dev_params";
+  let paramsOpen = true;
+  try { paramsOpen = localStorage.getItem(PARAMS_KEY) !== "closed"; } catch (e) { /* default: open */ }
+  function showParams() {
+    const has = !!$("dev-tune").querySelector(".t-tune");
+    $("dev-params").disabled = !has;
+    $("dev-params").classList.toggle("on", has && paramsOpen);
+    $("dev-tune").hidden = !(has && paramsOpen);
+  }
+  function mountTune(key, html) {
+    const panel = $("dev-tune");
+    panel.innerHTML = '<div class="dev-tune-hd"></div><div class="t-tune"></div>';
+    panel.querySelector(".dev-tune-hd").textContent = key + " · parameters";
+    const el = panel.querySelector(".t-tune");
+    el.innerHTML = html;
+    showParams();
+    return el;
+  }
+  function unmountTune(el) {
+    if (el && el.isConnected) $("dev-tune").innerHTML = "";
+    showParams();
   }
 
   function wire(restart) {
@@ -57,12 +95,18 @@ window.Dev = (function () {
     $("dev-skip").addEventListener("click", () => Flow.next());
     $("dev-jump").addEventListener("change", e => Flow.go(+e.target.value));
     $("dev-restart").addEventListener("click", restart);
+    $("dev-params").addEventListener("click", () => {
+      paramsOpen = !paramsOpen;
+      try { localStorage.setItem(PARAMS_KEY, paramsOpen ? "open" : "closed"); } catch (e) { /* ignore */ }
+      showParams();
+    });
+    showParams();
     document.addEventListener("keydown", e => {
       if (e.shiftKey && e.key === "ArrowRight") { e.preventDefault(); Flow.next(); }
     });
   }
 
-  return { wire, sync };
+  return { wire, sync, mountTune, unmountTune };
 })();
 
 (function () {
@@ -83,6 +127,7 @@ window.Dev = (function () {
   function startSession() {
     Store.newSession(genParticipantId());
     Store.setTasks(Tasks.set(), Tasks.lang(), Tasks.set() === Config.TASK_SET && Tasks.lang() === Config.TASK_LANG ? "config" : "dev");
+    assignTasks();
     Flow.build();
     Flow.go(0);
   }

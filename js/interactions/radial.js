@@ -1,9 +1,9 @@
 /* ═══════════════════════════════════════════════════════════════════
    3 · RADIAL / OPTIONS (bdr-prototype lab_03).
    Rest the pointer on an inbox card and, after a short dwell, the AI opens
-   two placement options beside the pointer: the AI's slot and a random
-   decoy, looking identical and in random order. Hover an option to
-   preview, click to place. Or ignore the menu and drag the card by hand.
+   two placement options beside the pointer: the AI's slot and a plausible
+   decoy drawn from the tile's heat row, looking identical and in random
+   order. Hover an option to preview, click to place. Or ignore the menu and drag the card by hand.
    ═══════════════════════════════════════════════════════════════════ */
 Interactions.register("radial", {
   mount(container, ctx) {
@@ -14,11 +14,24 @@ Interactions.register("radial", {
     const hover = { cardId: null, timer: null, hideTimer: null, menuOpen: false,
                     lastX: null, lastY: null, els: null, srcEl: null };
 
-    // The AI's slot plus one random decoy (0-based, distinct).
+    /* The AI's slot plus one decoy (0-based, distinct). The decoy is drawn from
+       the tile's heat row (the heatmap's probabilities), weighted by them, so it
+       is a slot the AI itself finds plausible: usually a neighbour, and in prio
+       tasks sometimes the competing reading. Never a slot with 0 % heat. Without
+       a heat row (or with all heat on the AI's slot) it falls back to a neighbour. */
     function suggestSlots(id) {
       const trueSlot = b.aiSlot(id);
+      const heat = b.byId[id].heat;
       const pool = [0, 1, 2, 3, 4, 5].filter(s => s !== trueSlot);
-      return { trueSlot, decoy: pool[0 | (Math.random() * pool.length)] };
+      let weights = pool.map(s => (heat ? heat[s] : 0) || 0);
+      if (!weights.some(w => w > 0)) weights = pool.map(s => (Math.abs(s - trueSlot) === 1 ? 1 : 0));
+      const total = weights.reduce((x, y) => x + y, 0);
+      let r = Math.random() * total;
+      for (let k = 0; k < pool.length; k++) {
+        r -= weights[k];
+        if (r < 0 && weights[k] > 0) return { trueSlot, decoy: pool[k] };
+      }
+      return { trueSlot, decoy: pool[weights.lastIndexOf(Math.max.apply(null, weights))] };
     }
 
     const b = Board.create(container, {
