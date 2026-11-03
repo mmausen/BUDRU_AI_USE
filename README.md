@@ -92,7 +92,7 @@ The AI recommends the active task's `target-order`.
 | 2 | `magnet` | lab_02 | A spring-driven fake cursor. Within a circular radius of the AI's slot, the dragged card is pulled part of the way toward it (strength 0.24), so you can still overrule it. The radius is 2.2 slot heights, measured live, so the field feels the same at any card size or window size. |
 | 3 | `radial` | lab_03 | Rest on an inbox card → two slot options appear: the AI's slot and a decoy, in random order. |
 | 4 | `heatmap` | lab_04 | Hover a card → every slot glows from white to deep purple by how likely the AI thinks it belongs there. |
-| 5 | `handoff` | lab_05 | Stop moving for 1 s and the AI takes the cursor and keeps sorting. Move to take back control. |
+| 5 | `handoff` | lab_05 + [bdr-dt-handoff](https://github.com/mmausen/mmausen.github.io-bdr-dt-handoff) | A purple take-over zone floats over the lower centre of the board. Rest the cursor inside it (0.25 s, `dwellMs`) and the AI takes the cursor and keeps sorting. Leave the zone and the AI cursor rushes back to your pointer: you're in control again, and a card it was carrying returns to the inbox. |
 | 6 | `override` | **new** | You sort all six alone, then hand over. The AI moves every tile it disagrees with. |
 
 **Override always overrides.** The AI changes at least `Config.OVERRIDE.minOverrides`
@@ -120,7 +120,7 @@ npm start       # → http://localhost:8080
   - **Jump to** goes straight to any step.
   - **Restart** starts a fresh session.
 
-  - **Params** shows or hides the running interaction's tuning controls in a panel under the bar: magnet strength, radius and spring, handoff speed and hesitation, heatmap opacity, the hint switch. The browser remembers whether it is open. Changes last until the task is rebuilt; defaults are in each module's `CFG`.
+  - **Params** shows or hides the running interaction's tuning controls in a panel under the bar: magnet strength, radius and spring, handoff zone delay, speed and hesitation, heatmap opacity, the hint switch. The browser remembers whether it is open. Changes last until the task is rebuilt; defaults are in each module's `CFG`.
 
   None of this exists without devMode.
   **It must be `false` for participants.**

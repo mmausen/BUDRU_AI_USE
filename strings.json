@@ -69,11 +69,15 @@
     },
     "handoff": {
       "badge": "Handoff",
-      "title": "The AI takes over when you pause",
-      "intro": "Drag cards into the ranking. When you stop moving, the AI takes the cursor and continues sorting. Move the mouse again at any time to take back control.",
-      "footer": "Pause to let the AI continue — move the mouse to take back control.",
+      "title": "The AI takes over in its zone",
+      "intro": "Drag cards into the ranking yourself. To let the AI continue, rest your cursor in the AI zone at the bottom: it takes the cursor and keeps sorting. Move out of the zone at any time to take back control.",
       "you": "You're in control",
-      "ai": "AI is sorting"
+      "ai": "AI is sorting",
+      "zone": {
+        "idle": "Rest the cursor here to let the AI take over",
+        "active": "AI is sorting … move out to take over",
+        "done": "All cards are placed"
+      }
     },
     "override": {
       "badge": "Override",

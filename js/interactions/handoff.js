@@ -1,21 +1,23 @@
 /* ═══════════════════════════════════════════════════════════════════
    5 · HANDOFF (bdr-prototype lab_05).
-   A shared cursor. The participant drags tiles by hand; the moment they
-   stop moving (CFG.idleMs) a fake AI cursor fades in, takes over and
-   carries on sorting — planning a human-ish motion (think → curve toward
-   the tile → grab → carry → drop). Any real input (move, click, key,
-   wheel) hands control straight back. The AI drops each tile in its own
-   suggested slot.
+   A shared cursor with a TAKE-OVER ZONE (after bdr-dt-handoff). The
+   participant drags tiles by hand; while their real cursor rests inside the
+   zone in the footer (for CFG.dwellMs) a fake AI cursor fades in, takes over
+   and carries on sorting — planning a human-ish motion (think → curve toward
+   the tile → grab → carry → drop). Leaving the zone hands control straight
+   back: the AI cursor rushes to the participant's pointer and fades out, and
+   a tile it was carrying goes back to the inbox untouched. The AI drops each
+   tile in its own suggested slot.
    ═══════════════════════════════════════════════════════════════════ */
 Interactions.register("handoff", {
   mount(container, ctx) {
     const CFG = {
-      idleMs: 1000,      // ms of no input before the AI takes over
+      dwellMs: 250,      // ms the cursor must rest in the zone before the AI takes over (0 = instant)
       speed: 10,         // 0–100 → travel speed (10 ≈ 527 px/s, half the original 28 ≈ 1062 px/s)
       hesitate: true,    // thinking pauses + second-guess approaches
       speedMin: 230, speedMax: 3200,   // px/s at speed 0 / 100
       fadeInMs: 500, fadeOutMs: 220,
-      returnMs: 190,     // sweep back to the user's pointer on takeover
+      returnMs: 190,     // rush back to the user's pointer when they leave the zone
     };
 
     const lerp = (a, z, t) => a + (z - a) * t;
@@ -28,7 +30,7 @@ Interactions.register("handoff", {
 
     const fc = { x: 0, y: 0, opacity: 0, active: false, carrying: null, seg: null, queue: [],
                  returning: false, returnT: 0, returnFrom: { x: 0, y: 0 } };
-    let lastActivity = performance.now();
+    let zoneSince = null;             // when the pointer entered the zone (null = outside)
     let lastPointer = { x: 0, y: 0 };
     let prev = performance.now(), lastStepTs = prev, rafId = null, watchdog = null;
     let drag = null;
@@ -38,18 +40,22 @@ Interactions.register("handoff", {
       task: ctx.task,
       drag: false,
       bannerRight: '<span class="ai-mode"><span class="dot"></span><span class="ai-mode-txt"></span></span>',
-      footerLeft: '<span class="t-note"></span>',
       tune:
+        '<label>Zone delay <input type="range" class="tune-dwell" min="0" max="1500" step="50" value="' + CFG.dwellMs + '"></label>' +
         '<label>Speed <input type="range" class="tune-speed" min="0" max="100" value="' + CFG.speed + '"></label>' +
         '<label class="opt"><input type="checkbox" class="tune-hes" checked> Hesitation</label>',
       cardDecor(div, card, from) { div.addEventListener("pointerdown", e => onCardPointerDown(e, card.id, from)); },
       onConfirm: ctx.onConfirm,
     });
-    b.$(".t-note").textContent = S.t("interactions.handoff.footer");
     b.root.insertAdjacentHTML("beforeend",
       '<div class="ai-cursor"><div class="ring"></div>' + AiCursor.SVG + '</div>');
     const cursorEl = b.$(".ai-cursor"), modeEl = b.$(".ai-mode"), modeTxt = b.$(".ai-mode-txt");
+    // The zone floats over the lower centre of the board, straddling both columns.
+    b.$(".t-main").insertAdjacentHTML("beforeend",
+      '<div class="ai-zone"><span class="ai-zone-dot"></span><span class="ai-zone-label"></span></div>');
+    const zoneEl = b.$(".ai-zone"), zoneTxt = b.$(".ai-zone-label");
     if (b.$(".tune-speed")) {
+      b.$(".tune-dwell").addEventListener("input", e => { CFG.dwellMs = +e.target.value; });
       b.$(".tune-speed").addEventListener("input", e => { CFG.speed = +e.target.value; });
       b.$(".tune-hes").addEventListener("change", e => { CFG.hesitate = e.target.checked; });
     }
@@ -57,7 +63,6 @@ Interactions.register("handoff", {
     /* ── user dragging (pointer events; drop by pointer position) ── */
     function onCardPointerDown(e, id, from) {
       if (e.button != null && e.button !== 0) return;
-      registerActivity(e);
       const card = e.currentTarget;
       const rect = card.getBoundingClientRect();
       drag = { id, from, started: false, startX: e.clientX, startY: e.clientY,
@@ -88,16 +93,24 @@ Interactions.register("handoff", {
       if (target != null) b.place(d.id, d.from, target);
       else if (b.inInboxAt(e.clientX, e.clientY) && d.from !== "inbox") b.returnToInbox(d.id, d.from);
       b.render();
-      registerActivity(e);
+      trackPointer(e);
     }
 
-    /* ── activity / hand-off ── */
-    // Dev controls (the dev bar and its Params panel) never count as taking back control.
-    const inTune = e => !!(e.target && e.target.closest && e.target.closest("#dev-tune, #dev-bar"));
-    function registerActivity(e) {
-      lastActivity = performance.now();
-      if (e && e.clientX != null) lastPointer = { x: e.clientX, y: e.clientY };
-      if (fc.active) deactivate();
+    /* ── take-over zone ──
+       Governed by where the real pointer is, not by idle time: inside the zone
+       → the AI drives; outside → the participant does. Hit-tested on every move
+       (not mouseenter) so a pointer already resting there when the task starts
+       or the intro card closes still counts. */
+    function inZone(x, y) {
+      const r = zoneEl.getBoundingClientRect();
+      return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+    }
+    function trackPointer(e) {
+      if (e.clientX == null) return;
+      lastPointer = { x: e.clientX, y: e.clientY };
+      const inside = !drag && inZone(e.clientX, e.clientY);   // dragging a card over it never hands off
+      if (inside && zoneSince == null) zoneSince = performance.now();
+      if (!inside) { zoneSince = null; if (fc.active) deactivate(); }
     }
     function activate() {
       const r = b.root.getBoundingClientRect();
@@ -105,6 +118,7 @@ Interactions.register("handoff", {
       fc.returning = false;
       fc.x = lastPointer.x || (r.left + r.width / 2);
       fc.y = lastPointer.y || (r.top + r.height / 2);
+      // Not logged yet. Hook: Store.log("ai_took_over", { interaction: "handoff" });
     }
     function deactivate() {
       fc.active = false;
@@ -117,7 +131,8 @@ Interactions.register("handoff", {
         fc.carrying = null;
       }
       b.clearHighlight();
-      // Sweep the cursor back to the user's pointer before fading: "here, it's yours again".
+      // Not logged yet. Hook: Store.log("user_took_back", { interaction: "handoff" });
+      // Rush the cursor back to the user's pointer before fading: "here, it's yours again".
       if (fc.opacity > 0.05) { fc.returning = true; fc.returnT = 0; fc.returnFrom = { x: fc.x, y: fc.y }; }
       else fc.returning = false;
     }
@@ -230,7 +245,7 @@ Interactions.register("handoff", {
       const dt = Math.min(50, now - prev); prev = now; lastStepTs = now;
       const complete = b.isFull();
       // No takeover while the intro card is open (ctx.paused) — it would sort behind it.
-      if (!complete && !fc.active && !fc.returning && !drag && !ctx.paused() && (now - lastActivity) > CFG.idleMs) activate();
+      if (!complete && !fc.active && !drag && !ctx.paused() && zoneSince != null && (now - zoneSince) >= CFG.dwellMs) activate();
       if ((complete || ctx.paused()) && fc.active) deactivate();
 
       const targetOp = (fc.active || fc.returning) ? 1 : 0;
@@ -252,14 +267,14 @@ Interactions.register("handoff", {
       modeEl.classList.toggle("auto", autoOn);
       modeTxt.textContent = S.t(autoOn ? "interactions.handoff.ai" : "interactions.handoff.you");
       b.root.classList.toggle("ai-driving", autoOn);
+      zoneEl.classList.toggle("active", fc.active);
+      zoneEl.classList.toggle("done", complete);
+      zoneTxt.textContent = S.t("interactions.handoff.zone." + (complete ? "done" : fc.active ? "active" : "idle"));
     }
     function rafLoop(now) { step(now); rafId = requestAnimationFrame(rafLoop); }
 
-    b.listen(window, "pointermove", e => { if (!inTune(e)) registerActivity(e); onDragMove(e); }, { passive: true });
-    b.listen(window, "pointerdown", e => { if (!inTune(e)) registerActivity(e); }, { passive: true });
+    b.listen(window, "pointermove", e => { trackPointer(e); onDragMove(e); }, { passive: true });
     b.listen(window, "pointerup", onDragUp);
-    b.listen(window, "keydown", registerActivity);
-    b.listen(window, "wheel", e => { if (!inTune(e)) registerActivity(e); }, { passive: true });
     b.onDestroy(() => { if (rafId) cancelAnimationFrame(rafId); clearInterval(watchdog); });
 
     b.render();
