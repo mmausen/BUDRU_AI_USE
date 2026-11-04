@@ -7,11 +7,23 @@
    - A session being replaced is archived first, so a second run in the same
      browser can never silently destroy the first.
    - sendRemote() POSTs the COMPLETE session to the collector (server.js) at
-     step boundaries; flush() is the sendBeacon last-gasp on tab close.
+     step boundaries; flush() is the sendBeacon last-gasp on tab close. Only
+     with Config.CONFIG.fileLogging — the server writes it to files.
 
-   ⚠ The pipeline is in place but NOTHING emits study data yet: no module
-   calls log(), addResult() or setSurvey(). Wire those in once the measures
-   are decided — see README "Logging".
+   What a session records (see README "Logging"):
+     anonId, date, startTime, startedAt   — who, and when the session began
+     logFolder                            — <timestamp>_<ID>, set when the ID is entered
+     surveys[<step>] = { answers, submittedAt }   — every questionnaire
+     interactionTimes[] = { n, interaction, taskId, startedAt, endedAt, durationMs,
+                            firstMoveAt, firstPlacementAt, msToFirstMove, msFirstPlacementToConfirm }
+       startedAt = Start pressed on the intro card, endedAt = ranking confirmed;
+       the questionnaires are separate steps, so they are never inside it.
+     results[]  — per interaction, on Confirm: final ranking vs the AI's, counts (see Task.confirm)
+     events[]   — every pick-up, placement, thought read and AI event, tagged
+                  with the running interaction (setContext) — also events.jsonl
+     thoughtsVisible — whether the AI thought chips were shown at all
+   Times are local ISO strings with the UTC offset (2026-11-04T10:21:33.120+01:00).
+   Slots in results and events are 1-based (1 = top); cards are tile keys.
    ═══════════════════════════════════════════════════════════════════ */
 window.Store = (function () {
   const KEY = "bdr_aiuse_session";
@@ -21,25 +33,50 @@ window.Store = (function () {
   const perfStart = performance.now();
   let data = null;
 
-  // Master switch (Config.CONFIG.loggingEnabled). Off → no events, no POST, no beacon.
-  const logging = () => Config.CONFIG.loggingEnabled !== false;
+  // Master switch (Config.CONFIG.fileLogging). Off → nothing is POSTed, so no files are written.
+  const logging = () => Config.CONFIG.fileLogging === true;
+
+  // Local time as ISO 8601 with the UTC offset, e.g. 2026-11-04T10:21:33.120+01:00.
+  const pad = (n, w) => String(n).padStart(w || 2, "0");
+  function localIso(d) {
+    d = d || new Date();
+    const off = -d.getTimezoneOffset(), sign = off >= 0 ? "+" : "-", a = Math.abs(off);
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}` +
+           `.${pad(d.getMilliseconds(), 3)}${sign}${pad(Math.floor(a / 60))}:${pad(a % 60)}`;
+  }
+  // <YYYY-MM-DD_HH-MM-SS>_<id>: the participant's log folder (the server sanitises it again).
+  function folderName(id, d) {
+    d = d || new Date();
+    const stamp = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}_${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}`;
+    return stamp + "_" + (String(id).replace(/[^A-Za-z0-9_-]/g, "") || "noid");
+  }
 
   function newSession(pid) {
     archiveCurrent("replaced by a new session");
+    const now = new Date();
+    const started = localIso(now);
     data = {
       schemaVersion: SCHEMA_VERSION,
-      participantId: pid || "",
+      participantId: pid || "",           // auto-generated session key (not the typed ID)
       anonId: null,                       // the researcher-issued ID typed on the first screen
+      date: started.slice(0, 10),         // local date the session started
+      startTime: started.slice(11, 19),   // local time the session started
+      startedAt: started,
+      idEnteredAt: null,
+      // Without an ID step the folder is named after the session key from the start.
+      logFolder: Config.STEPS.anonId ? null : folderName(pid, now),
       config: { ...Config.CONFIG },
       steps: { ...Config.STEPS },         // snapshotted, so a run stays interpretable later
       interactions: Config.INTERACTIONS.slice(),
       taskSet: null,                      // placeholder | fixed | prio (see setTasks)
-      taskLang: null,
       taskSource: null,                   // "config" | "dev" (picked in the dev bar)
+      lang: null,                         // "en" | "de" — interface, questionnaires and tasks
+      langChanges: [],                    // { lang, step, at } each time the participant switched
+      thoughtsVisible: !!Config.THOUGHTS.enabled,   // AI thought chips shown on the cards?
       taskOrder: [],                      // task id per interaction, in interaction order
-      startedAt: new Date().toISOString(),
       currentStep: 0,
       surveys: {},
+      interactionTimes: [],
       results: [],
       events: [],
       completed: false,
@@ -50,26 +87,86 @@ window.Store = (function () {
 
   function get() { return data; }
   function setStep(i) { if (data) { data.currentStep = i; save(); } }
-  function setAnonId(v) { if (data) { data.anonId = v || null; save(); } }
-  function anonId() { return data ? data.anonId : null; }
-  function setTasks(set, lang, source) {
+  // The typed ID also fixes the log folder: <timestamp of entry>_<ID>. Set once per session.
+  function setAnonId(v) {
     if (!data) return;
-    data.taskSet = set; data.taskLang = lang; data.taskSource = source || data.taskSource;
+    data.anonId = v || null;
+    if (v && !data.logFolder) {
+      const now = new Date();
+      data.idEnteredAt = localIso(now);
+      data.logFolder = folderName(v, now);
+    }
+    save();
+  }
+  function anonId() { return data ? data.anonId : null; }
+  function setTasks(set, source) {
+    if (!data) return;
+    data.taskSet = set; data.taskSource = source || data.taskSource;
+    save();
+  }
+  // `switched` → the participant changed it (recorded with the step it happened on).
+  function setLang(lang, switched) {
+    if (!data) return;
+    if (switched && lang !== data.lang) data.langChanges.push({ lang, step: data.currentStep, at: new Date().toISOString() });
+    data.lang = lang;
     save();
   }
   function setTaskOrder(ids) { if (data) { data.taskOrder = ids.slice(); save(); } }
 
-  /* ── the logging API (not called anywhere yet) ── */
+  /* ── context ── the interaction now running; stamped on every event */
+  let context = null;
+  function setContext(c) { context = c || null; }
+
+  /* ── AI interaction times ── one entry per interaction (n). A task rebuilt
+     mid-run (language switch, ⓘ reopened) keeps its first start. */
+  function interactionStart(step, taskId) {
+    if (!data) return;
+    let r = data.interactionTimes.find(x => x.n === step.n);
+    if (r && !r.endedAt) return;                      // already running
+    if (r) data.interactionTimes.splice(data.interactionTimes.indexOf(r), 1);   // dev: run again
+    data.interactionTimes.push({ n: step.n, interaction: step.interaction, taskId: taskId || null,
+                                 startedAt: localIso(), endedAt: null, durationMs: null,
+                                 firstMoveAt: null, firstPlacementAt: null,
+                                 msToFirstMove: null, msFirstPlacementToConfirm: null });
+    data.interactionTimes.sort((a, b) => a.n - b.n);
+    save();
+  }
+  function interactionEnd(step) {
+    if (!data) return;
+    const r = data.interactionTimes.find(x => x.n === step.n);
+    if (!r || r.endedAt) return;
+    const now = new Date();
+    r.endedAt = localIso(now);
+    r.durationMs = now - Date.parse(r.startedAt);
+    if (r.firstPlacementAt) r.msFirstPlacementToConfirm = now - Date.parse(r.firstPlacementAt);
+    save();
+  }
+  // The participant's first pick-up ("firstMoveAt") / the first card placed by anyone
+  // ("firstPlacementAt") in the running interaction. Only the first one counts.
+  function markFirst(field) {
+    if (!data || !context) return;
+    const r = data.interactionTimes.find(x => x.n === context.n);
+    if (!r || r.endedAt || r[field]) return;
+    const now = new Date();
+    r[field] = localIso(now);
+    if (field === "firstMoveAt") r.msToFirstMove = now - Date.parse(r.startedAt);
+    save();
+  }
+
+  /* ── the logging API ── */
   function log(type, payload) {
     if (!data || !logging()) return;
     data.events.push(Object.assign(
-      { type, ts: Date.now(), tRel: Math.round(performance.now() - perfStart) },
+      { type, at: localIso(), ts: Date.now(), tRel: Math.round(performance.now() - perfStart) },
+      context || {},
       payload || {}
     ));
     save();
   }
   function addResult(r) { if (data && logging()) { data.results.push(r); save(); } }
-  function setSurvey(id, answers) { if (data && logging()) { data.surveys[id] = answers; save(); } }
+  function setSurvey(id, answers) {
+    if (data) { data.surveys[id] = { answers, submittedAt: localIso() }; save(); }
+  }
   function markComplete() { if (data) { data.completed = true; save(); } }
 
   /* ── localStorage ── */
@@ -164,8 +261,8 @@ window.Store = (function () {
 
   return {
     SCHEMA_VERSION,
-    newSession, get, setStep, setAnonId, anonId, setTasks, setTaskOrder,
-    log, addResult, setSurvey, markComplete,
+    newSession, get, setStep, setAnonId, anonId, setTasks, setLang, setTaskOrder,
+    setContext, interactionStart, interactionEnd, markFirst, log, addResult, setSurvey, markComplete,
     load, download, sendRemote, flush, archive, flushArchive,
   };
 })();

@@ -12,6 +12,11 @@
    The AI ALWAYS overrides at least Config.OVERRIDE.minOverrides tiles. If the
    participant's order already matches the AI's ranking, the AI swaps a
    random adjacent pair — so even full agreement gets overridden.
+
+   Logs "override_handover" (the participant's own order), the AI's moves as
+   placements with by "ai", and "override_done" (every tile it changed). The
+   result (aiSummary) says for each changed tile whether the participant kept
+   the AI's slot, reverted it to their own, or moved it somewhere else.
    ═══════════════════════════════════════════════════════════════════ */
 Interactions.register("override", {
   mount(container, ctx) {
@@ -19,6 +24,7 @@ Interactions.register("override", {
     let phase = "sort";
     const aiMoved = new Set();     // ids the AI moved — marked on their cards
     let cursor = null;
+    let userOrder = null, changes = null;   // the order handed over; tiles the AI changed
 
     const b = Board.create(container, {
       key: "override",
@@ -75,6 +81,8 @@ Interactions.register("override", {
 
       const user = b.slots.slice();
       const target = targetFor(user);
+      userOrder = user;
+      Store.log("override_handover", { order: user.map(b.keyOf) });
 
       let carrying = null;
       const btn = b.$(".t-handover").getBoundingClientRect();
@@ -111,7 +119,7 @@ Interactions.register("override", {
           b.clearHighlight();
           aiMoved.add(id);
           if (b.slots[i]) aiMoved.add(b.slots[i]);
-          b.place(id, from, i);
+          b.place(id, from, i, { by: "ai", method: "ai" });
           b.render();
           await cursor.wait(420);
         }
@@ -123,6 +131,9 @@ Interactions.register("override", {
       }
 
       const n = b.slots.filter((id, i) => id !== user[i]).length;
+      changes = b.slots.map((id, i) => ({ id, userSlot: user.indexOf(id), aiSlot: i }))
+                       .filter(c => c.userSlot !== c.aiSlot);
+      Store.log("override_done", { changed: changes.map(c => ({ card: b.keyOf(c.id), userSlot: c.userSlot + 1, aiSlot: c.aiSlot + 1 })) });
       phase = "review";
       b.locked = !OPT.editAfterOverride;
       b.root.classList.remove("ai-driving");
@@ -131,6 +142,19 @@ Interactions.register("override", {
     }
 
     b.onDestroy(() => { if (cursor) cursor.abort(); });
+
+    // For the result: what became of each tile the AI changed, at Confirm.
+    b.aiSummary = () => {
+      if (!changes) return { handedOver: false };
+      const tiles = changes.map(c => {
+        const finalSlot = b.slots.indexOf(c.id);
+        const fate = finalSlot === c.aiSlot ? "kept" : finalSlot === c.userSlot ? "reverted" : "moved";
+        return { card: b.keyOf(c.id), userSlot: c.userSlot + 1, aiSlot: c.aiSlot + 1, finalSlot: finalSlot + 1, fate };
+      });
+      const count = f => tiles.filter(t => t.fate === f).length;
+      return { handedOver: true, userOrder: userOrder.map(b.keyOf), changed: tiles.length,
+               kept: count("kept"), reverted: count("reverted"), moved: count("moved"), tiles };
+    };
 
     b.render();
     return b;

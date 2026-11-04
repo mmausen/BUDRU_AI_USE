@@ -17,11 +17,28 @@ Participant ID → pre-questionnaire
   → AI 4 HEATMAP  → mid-questionnaire
   → AI 5 HANDOFF  → mid-questionnaire
   → AI 6 OVERRIDE → mid-questionnaire
-  → final screener → thank-you page
+  → thank-you page
 ```
 
-All questionnaires are placeholders (`strings.json` → `surveys.pre` / `mid` / `final`).
 Each interaction opens with a short intro card; the ⓘ button in its banner reopens it.
+
+## Questionnaires
+
+Both live in `strings.json` → `surveys.pre` / `mid`, in English and German. Every rating is a required 1–7 scale.
+
+- **Pre (baseline, 7 items):** general trust in AI, reliability, comfort relying on AI recommendations, then four self-reports (how often you use AI tools, familiarity, confidence evaluating AI outputs, AI for work-related tasks). The self-report items carry their own end labels, for example "Never … Very often".
+- **Mid (after each interaction, 9 items):** understanding, clarity of the AI's behaviour, control of the outcome, AI influence, AI capability, helpfulness, ease, naturalness, and willingness to rely on it again. The kicker names the interaction just used.
+
+A `likert` item takes `scale` (default 7) and optional `anchors: [low, high]`; without anchors it uses "Strongly disagree … Strongly agree". Answers are validated but not stored yet (see Logging).
+
+## Language
+
+Everything the participant sees comes in English and German: interface, intro cards, questionnaires and task content. An **EN / DE switch** sits top right on every screen, outside devMode.
+
+- `Config.LANG.default` is the starting language; `Config.LANG.switcher: false` hides the switch.
+- The participant's choice is remembered in their browser.
+- Switching on a questionnaire relabels it and keeps the answers. Switching during a task rebuilds the task in the new language, so cards placed so far are reset.
+- The session records `lang` and every switch in `langChanges` (language, step, time).
 
 ## Task sets
 
@@ -59,7 +76,7 @@ Each file has the same schema:
   - **prio**: wider. Where a case has a competing reading, there is a second bump. Example: a "within the hour" case pulled toward the top by a deadline-first reading. The target slot is always the most likely one.
 - **prio order principle**: ongoing harm to people and losses that can't be undone come first. Then quick fixes due within the hour, then today's deadlines, then the fortnight items.
 
-Set the default with `Config.TASK_SET` and `Config.TASK_LANG`. In devMode, the dev bar's **Tasks** and **EN/DE** pickers switch both live. The task on screen is rebuilt, and the browser remembers the choice. Each session records `taskSet`, `taskLang` and `taskSource` (`config` or `dev`). Interface text outside the task content (buttons, "remaining", the heatmap legend) is still English only.
+Set the default with `Config.TASK_SET`. In devMode, the dev bar's **Tasks** picker switches it live: the task on screen is rebuilt, and the browser remembers the choice. Each session records `taskSet` and `taskSource` (`config` or `dev`). The task language follows the participant's language (see Language).
 
 ### Which task each interaction gets
 
@@ -112,9 +129,10 @@ npm start       # → http://localhost:8080
 ## Configuring (`js/config.js`)
 
 - `INTERACTIONS` — an array, and its order is the running order. Remove an entry to drop that interaction.
+- `LANG` — `default` language (`"en"` / `"de"`) and whether the EN / DE `switcher` is shown.
 - `RANDOM_TASK_ASSIGNMENT` — random task per interaction, per session (see Task sets).
 - `THOUGHTS` — `enabled` shows the AI's reasoning on each card; `openDelayMs` is the hover delay.
-- `STEPS` — switches `anonId`, `preSurvey`, `midSurvey` and `finalSurvey` on or off.
+- `STEPS` — switches `anonId`, `preSurvey` and `midSurvey` on or off.
 - `CONFIG.devMode` — the dev bar, top-right:
   - **Skip ▸**, or Shift + →, goes to the next step, even mid-task.
   - **Jump to** goes straight to any step.
@@ -124,26 +142,79 @@ npm start       # → http://localhost:8080
 
   None of this exists without devMode.
   **It must be `false` for participants.**
-- `CONFIG.loggingEnabled` — the master switch for the collector (see below).
+- `CONFIG.fileLogging` — saves log files on the hosting machine (see Logging).
 
 ## Logging
 
-The logging pipeline from designing-trust-pt is in place, but **no study data is logged yet**:
+With `Config.CONFIG.fileLogging: true` (default), the machine running `npm start` saves one folder per participant. Set it to `false` and nothing is sent; the session then only autosaves to the browser's localStorage.
 
-- `Store` keeps the session in memory and autosaves it to localStorage. A session being
-  replaced is archived first.
-- `Store.sendRemote()` POSTs the whole session to `/collect-logs` at step boundaries.
-  `Store.flush()` sends a `sendBeacon` when the tab closes.
-- `server.js` writes one folder per participant: `logs/<participantId>/sessions/<id>.json`
-  plus an append-only `events.jsonl`. The `logs/` folder is blocked from HTTP, and no IP
-  address is ever recorded.
+**Where.** In the project: `logs/`. The whole folder is git-ignored (`/logs/` in `.gitignore`), so it is never committed or pushed, and checkout, pull or reset leave it alone. Only `git clean -x` would delete it. The server never serves it over HTTP. If `logs/` or a participant's folder is deleted, it is created again: at start-up and before every write, with the full session (each write carries everything). Change the location with `LOG_DIR=/some/path npm start`. The server prints the path on start, and `GET /collect-logs/health` returns it.
 
-The session currently holds only its identity: the auto-generated `participantId`, the
-typed `anonId`, the step switches, the interaction order and the task assignment (`taskOrder`). Nothing calls `Store.log()`,
-`Store.addResult()` or `Store.setSurvey()` yet. The hook points are marked in `js/task.js`
-(`confirm`) and `js/screens.js` (`submitSurvey`).
+**When.** A participant's folder is created only after they enter their ID:
 
-`loggingEnabled` is `false` by default, so nothing is POSTed until you turn it on.
+```
+logs/
+  2026-11-04_10-32-20_P-0123/      ← time the ID was entered + the ID
+    session.json                   ← everything below
+    events.jsonl                   ← the event stream, one JSON object per line
+```
+
+Before the ID, nothing is written. Without the ID step (`STEPS.anonId: false`), the folder uses the auto-generated session key instead.
+
+**What `session.json` holds.** The whole session, rewritten at every step boundary (ID, Start, Confirm, every questionnaire, the end), so it is always complete up to the last step:
+
+| Field | Content |
+|---|---|
+| `anonId` | The typed participant ID |
+| `date`, `startTime` | Local date and time the session began |
+| `startedAt`, `idEnteredAt` | The same moments as full timestamps with UTC offset |
+| `surveys` | Every questionnaire: `pre` and `mid_<n>_<interaction>`, each `{ answers: { item id: 1–7 }, submittedAt }` |
+| `interactionTimes` | Per AI interaction: `n`, `interaction`, `taskId`, `startedAt` (Start pressed on the intro card), `endedAt` (ranking confirmed), `durationMs`, plus `firstMoveAt` / `msToFirstMove` (the participant's first pick-up) and `firstPlacementAt` / `msFirstPlacementToConfirm` (first card placed by anyone → Confirm). Questionnaires are separate steps, so they are never inside this time. A task rebuilt mid-run (language switch) keeps its first start. |
+| `thoughtsVisible` | Whether the AI thought chips were shown at all (`Config.THOUGHTS.enabled`). Also on every result. |
+| `results` | Per AI interaction, on Confirm: see below |
+| `events` | Every pick-up, placement and AI event: see below |
+| also | language and switches (`lang`, `langChanges`), task set and assignment (`taskSet`, `taskOrder`), interaction order, step and config switches, `completed` |
+
+All times are local ISO 8601 with the UTC offset, e.g. `2026-11-04T10:32:21.247+01:00`. Cards are tile keys (as in `tasks/*.json`); slots are 1-based (1 = top).
+
+**Results** (`results[]`, one per confirmed interaction):
+
+- `ranking` and `aiRanking` — tile keys top → bottom
+- `exactMatches` — tiles in exactly the AI's slot (0–6)
+- `rankDistance` — Σ |participant slot − AI slot| (0 = identical, 18 = fully reversed)
+- `pickups`, `placedByParticipant`, `placedByAi`, `participantOnAiSlot`, `returnsToInbox`, `thoughtsRead`
+- `ai` — what the interaction's AI did and what became of it:
+
+| Interaction | `ai` |
+|---|---|
+| hint | `hintsShown`, `hintsFollowed` (dropped on the hinted slot), `hintsIgnored` |
+| magnet | `snaps` (card pulled fully onto the AI slot), `snapsAccepted` (released there), `pulledAway` (dragged back out) |
+| radial | `optionsShown`, `choseAiOption`, `choseDecoy`, `placedByDrag` |
+| heatmap | `hovers`, `hoversPerCard` |
+| handoff | `takeovers`, `takebacks` (participant left the zone) |
+| override | `userOrder` (handed over), `changed`, and per changed tile its `fate`: `kept` (AI's slot), `reverted` (participant's own slot) or `moved` (elsewhere), with counts |
+
+**Events** (`events[]` and `events.jsonl`). Each carries `type`, `at`, the interaction `n` / `interaction` / `taskId`, and:
+
+| `type` | Fields |
+|---|---|
+| `pickup` | `card`, `from` (`inbox` or slot) |
+| `place` | `card`, `from`, `to`, `by` (`participant` / `ai`), `method` (`drag` / `option` / `ai`), `aiSlot`, `toAiSlot`, `displaced`, `displacedTo`; magnet adds `snapped`, radial adds `option` (`ai` / `decoy`) |
+| `unplace` | `card`, `from` (dragged back to the inbox) |
+| `thought_read` | `card`, `ms` the bubble was open |
+| `hint_shown` | `card`, `aiSlot` |
+| `magnet_snap` / `magnet_release` | `card` (`aiSlot` on snap) |
+| `options_shown` | `card`, `aiSlot`, `decoySlot`, `top` (which option was on top) |
+| `heat_hover` | `card`, `ms` |
+| `ai_takeover` / `ai_takeback` | `placedSoFar`; takeback adds `reason` (`left_zone` / `done` / `paused`) and `droppedCarry` |
+| `override_handover` / `override_done` | the handed-over `order` / every `changed` tile with `userSlot` and `aiSlot` |
+
+A task rebuilt by a language switch starts its counters afresh; its events stay in the stream.
+
+**Details.**
+- Every POST carries the whole session, so a dropped request is healed by the next one. Sessions the server never acknowledged are re-sent on the next page load.
+- No IP address is ever recorded.
+- On GitHub Pages there is no server, so nothing can be saved there.
 
 ## Files
 
@@ -159,7 +230,7 @@ typed `anonId`, the step switches, the interaction order and the task assignment
 | `js/ai-cursor.js` | AI cursor glyph and scripted mover (handoff, override) |
 | `js/store.js` | Session and logging pipeline |
 | `js/main.js` | Boot, dev bar, desktop gate |
-| `strings.json` | All interface text and placeholder questionnaires (English) |
+| `strings.json` | All interface text and the questionnaires, under `en` and `de` |
 | `tasks/*.json` | The three task sets |
 
 After editing JS or CSS, bump the `?v=N` on the tags in `index.html`. The preview browser caches hard.

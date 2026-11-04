@@ -1,120 +1,482 @@
 {
-  "ui": {
-    "brand": "DFKI · AI Use",
-    "mobile": {
-      "heading": "Please use a desktop computer",
-      "body": "This study is about working together with an AI using a mouse or trackpad. It cannot run on a phone or tablet.",
-      "hint": "Open this link on a computer to take part."
-    },
-    "anonId": {
-      "heading": "Participant ID",
-      "body": "Please enter the participant ID the research team gave you.",
-      "label": "Participant ID",
-      "placeholder": "e.g. P-0123",
-      "required": "Please enter your participant ID to continue.",
-      "next": "Continue"
-    },
-    "survey": {
-      "continue": "Continue",
-      "required": "Please answer all required questions.",
-      "likertLow": "Strongly disagree",
-      "likertHigh": "Strongly agree"
-    },
-    "task": {
-      "brief": "Rank the six items by urgency — most urgent at the top.",
-      "inbox": "Inbox — incoming items",
-      "remaining": "{n} remaining",
-      "ladder": "Urgency ranking — drag items here",
-      "allPlaced": "All items placed.",
-      "mostUrgent": "Most urgent",
-      "leastUrgent": "Least urgent",
-      "confirm": "Confirm ranking",
-      "progress": "AI interaction {n} of {total}",
-      "start": "Start",
-      "info": "How does this work?",
-      "thought": "The AI's reasoning",
-      "thoughtIntro": "Hover the speech bubble on a card to read the AI's reasoning for it."
-    },
-    "end": {
-      "title": "Thank you for participating!",
-      "note": "Your session is complete. You can now close this window."
-    }
-  },
-
-  "interactions": {
-    "hint": {
-      "badge": "Hint",
-      "title": "The AI shows you a hint",
-      "intro": "When you pick up a card, the AI highlights the slot it suggests for that card. It only hints — you decide where every card lands.",
-      "footer": "Pick up a card to see the AI's suggestion."
-    },
-    "magnet": {
-      "badge": "Magnet",
-      "title": "The AI pulls your cards",
-      "intro": "Pick up a card and move it into the ranking. When the card comes near the slot the AI suggests, the AI pulls it toward that slot. You can always place it somewhere else: just keep moving the card where you want it.",
-      "footer": "Near its suggested slot, the AI pulls the card in. Keep moving to place it elsewhere."
-    },
-    "radial": {
-      "badge": "Options",
-      "title": "The AI offers two options",
-      "intro": "Rest the pointer on a card in the inbox and the AI opens two placement options beside it. Hover an option to preview it, click to place the card. Or ignore the options and drag the card yourself.",
-      "footer": "The AI proposes two slots — pick one, or drag the card yourself."
-    },
-    "heatmap": {
-      "badge": "Heatmap",
-      "title": "The AI shows how likely each slot is",
-      "intro": "Hover a card and every slot in the ranking lights up in purple: the deeper the purple, the more likely the AI thinks the card belongs there. It is only a suggestion — you place every card by hand.",
-      "footer": "Less likely",
-      "footerHot": "More likely"
-    },
-    "handoff": {
-      "badge": "Handoff",
-      "title": "The AI takes over in its zone",
-      "intro": "Drag cards into the ranking yourself. To let the AI continue, rest your cursor in the AI zone at the bottom: it takes the cursor and keeps sorting. Move out of the zone at any time to take back control.",
-      "you": "You're in control",
-      "ai": "AI is sorting",
-      "zone": {
-        "idle": "Rest the cursor here to let the AI take over",
-        "active": "AI is sorting … move out to take over",
-        "done": "All cards are placed"
+  "en": {
+    "ui": {
+      "brand": "DFKI · AI Use",
+      "mobile": {
+        "heading": "Please use a desktop computer",
+        "body": "This study is about working together with an AI using a mouse or trackpad. It cannot run on a phone or tablet.",
+        "hint": "Open this link on a computer to take part."
+      },
+      "anonId": {
+        "heading": "Participant ID",
+        "body": "Please enter the participant ID the research team gave you.",
+        "label": "Participant ID",
+        "placeholder": "e.g. P-0123",
+        "required": "Please enter your participant ID to continue.",
+        "next": "Continue"
+      },
+      "survey": {
+        "continue": "Continue",
+        "required": "Please answer all required questions.",
+        "likertLow": "Strongly disagree",
+        "likertHigh": "Strongly agree"
+      },
+      "task": {
+        "brief": "Rank the six items by urgency — most urgent at the top.",
+        "inbox": "Inbox — incoming items",
+        "remaining": "{n} remaining",
+        "ladder": "Urgency ranking — drag items here",
+        "allPlaced": "All items placed.",
+        "mostUrgent": "Most urgent",
+        "leastUrgent": "Least urgent",
+        "confirm": "Confirm ranking",
+        "progress": "AI interaction {n} of {total}",
+        "start": "Start",
+        "info": "How does this work?",
+        "thought": "The AI's reasoning",
+        "thoughtIntro": "Hover the speech bubble on a card to read the AI's reasoning for it."
+      },
+      "end": {
+        "title": "Thank you for participating!",
+        "note": "Your session is complete. You can now close this window."
+      },
+      "lang": {
+        "label": "Language"
       }
     },
-    "override": {
-      "badge": "Override",
-      "title": "Sort first — then the AI reviews",
-      "intro": "First, rank all six items yourself. When you are done, hand your ranking to the AI. The AI will review it and change what it disagrees with.",
-      "handOver": "Hand over to the AI",
-      "sortFirst": "Rank all six items, then hand them over to the AI.",
-      "working": "The AI is reviewing your ranking…",
-      "done": "The AI changed {n} of your placements.",
-      "doneEdit": "The AI changed {n} of your placements. You can still adjust the ranking before confirming."
+    "interactions": {
+      "hint": {
+        "badge": "Hint",
+        "title": "The AI shows you a hint",
+        "intro": "When you pick up a card, the AI highlights the slot it suggests for that card. It only hints — you decide where every card lands.",
+        "footer": "Pick up a card to see the AI's suggestion."
+      },
+      "magnet": {
+        "badge": "Magnet",
+        "title": "The AI pulls your cards",
+        "intro": "Pick up a card and move it into the ranking. When the card comes near the slot the AI suggests, the AI pulls it toward that slot. You can always place it somewhere else: just keep moving the card where you want it.",
+        "footer": "Near its suggested slot, the AI pulls the card in. Keep moving to place it elsewhere."
+      },
+      "radial": {
+        "badge": "Options",
+        "title": "The AI offers two options",
+        "intro": "Rest the pointer on a card in the inbox and the AI opens two placement options beside it. Hover an option to preview it, click to place the card. Or ignore the options and drag the card yourself.",
+        "footer": "The AI proposes two slots — pick one, or drag the card yourself."
+      },
+      "heatmap": {
+        "badge": "Heatmap",
+        "title": "The AI shows how likely each slot is",
+        "intro": "Hover a card and every slot in the ranking lights up in purple: the deeper the purple, the more likely the AI thinks the card belongs there. It is only a suggestion — you place every card by hand.",
+        "footer": "Less likely",
+        "footerHot": "More likely",
+        "mostLikely": "Most likely"
+      },
+      "handoff": {
+        "badge": "Handoff",
+        "title": "The AI takes over in its zone",
+        "intro": "Drag cards into the ranking yourself. To let the AI continue, rest your cursor in the AI zone at the bottom: it takes the cursor and keeps sorting. Move out of the zone at any time to take back control.",
+        "you": "You're in control",
+        "ai": "AI is sorting",
+        "zone": {
+          "idle": "Rest the cursor here to let the AI take over",
+          "active": "AI is sorting … move out to take over",
+          "done": "All cards are placed"
+        }
+      },
+      "override": {
+        "badge": "Override",
+        "title": "Sort first — then the AI reviews",
+        "intro": "First, rank all six items yourself. When you are done, hand your ranking to the AI. The AI will review it and change what it disagrees with.",
+        "handOver": "Hand over to the AI",
+        "sortFirst": "Rank all six items, then hand them over to the AI.",
+        "working": "The AI is reviewing your ranking…",
+        "done": "The AI changed {n} of your placements.",
+        "doneEdit": "The AI changed {n} of your placements. You can still adjust the ranking before confirming."
+      }
+    },
+    "surveys": {
+      "pre": {
+        "kicker": "Before we start",
+        "title": "Your experience with AI",
+        "intro": "Please rate each statement on a scale from 1 to 7.",
+        "questions": [
+          {
+            "id": "pre_trust_general",
+            "type": "likert",
+            "scale": 7,
+            "label": "I generally trust AI systems.",
+            "required": true
+          },
+          {
+            "id": "pre_reliable",
+            "type": "likert",
+            "scale": 7,
+            "label": "AI systems are generally reliable.",
+            "required": true
+          },
+          {
+            "id": "pre_rely_comfort",
+            "type": "likert",
+            "scale": 7,
+            "label": "I am comfortable relying on AI recommendations.",
+            "required": true
+          },
+          {
+            "id": "pre_use_freq",
+            "type": "likert",
+            "scale": 7,
+            "label": "How often do you use AI tools?",
+            "required": true,
+            "anchors": [
+              "Never",
+              "Very often"
+            ]
+          },
+          {
+            "id": "pre_familiarity",
+            "type": "likert",
+            "scale": 7,
+            "label": "How familiar are you with AI systems?",
+            "required": true,
+            "anchors": [
+              "Not at all familiar",
+              "Very familiar"
+            ]
+          },
+          {
+            "id": "pre_eval_confidence",
+            "type": "likert",
+            "scale": 7,
+            "label": "How confident are you in evaluating AI outputs?",
+            "required": true,
+            "anchors": [
+              "Not at all confident",
+              "Very confident"
+            ]
+          },
+          {
+            "id": "pre_use_work",
+            "type": "likert",
+            "scale": 7,
+            "label": "How often do you use AI for work-related tasks?",
+            "required": true,
+            "anchors": [
+              "Never",
+              "Very often"
+            ]
+          }
+        ]
+      },
+      "mid": {
+        "kicker": "About the interaction you just used · {badge}",
+        "title": "How was working with this AI?",
+        "intro": "Please rate each statement on a scale from 1 (strongly disagree) to 7 (strongly agree).",
+        "questions": [
+          {
+            "id": "mid_understood",
+            "type": "likert",
+            "scale": 7,
+            "label": "I understood how the AI was assisting me.",
+            "required": true
+          },
+          {
+            "id": "mid_clear_why",
+            "type": "likert",
+            "scale": 7,
+            "label": "It was clear why the AI behaved the way it did.",
+            "required": true
+          },
+          {
+            "id": "mid_control",
+            "type": "likert",
+            "scale": 7,
+            "label": "I felt in control of the final outcome.",
+            "required": true
+          },
+          {
+            "id": "mid_influence",
+            "type": "likert",
+            "scale": 7,
+            "label": "The AI influenced my decisions.",
+            "required": true
+          },
+          {
+            "id": "mid_capable",
+            "type": "likert",
+            "scale": 7,
+            "label": "The AI appeared capable of helping with this task.",
+            "required": true
+          },
+          {
+            "id": "mid_helpful",
+            "type": "likert",
+            "scale": 7,
+            "label": "The AI support was helpful.",
+            "required": true
+          },
+          {
+            "id": "mid_easier",
+            "type": "likert",
+            "scale": 7,
+            "label": "This interaction made the task easier to complete.",
+            "required": true
+          },
+          {
+            "id": "mid_natural",
+            "type": "likert",
+            "scale": 7,
+            "label": "Working with the AI felt natural.",
+            "required": true
+          },
+          {
+            "id": "mid_rely_again",
+            "type": "likert",
+            "scale": 7,
+            "label": "I would rely on this type of AI support in a similar task.",
+            "required": true
+          }
+        ]
+      }
     }
   },
-
-  "surveys": {
-    "pre": {
-      "kicker": "Before we start",
-      "title": "Pre-questionnaire (placeholder)",
-      "questions": [
-        { "id": "pre_q1", "type": "likert", "label": "Placeholder: I trust AI systems in general.", "required": false },
-        { "id": "pre_q2", "type": "text",   "label": "Placeholder: Any experience with AI tools?", "required": false }
-      ]
+  "de": {
+    "ui": {
+      "brand": "DFKI · AI Use",
+      "mobile": {
+        "heading": "Bitte verwenden Sie einen Desktop-Computer",
+        "body": "In dieser Studie arbeiten Sie mit Maus oder Trackpad zusammen mit einer KI. Auf einem Smartphone oder Tablet funktioniert sie nicht.",
+        "hint": "Öffnen Sie diesen Link auf einem Computer, um teilzunehmen."
+      },
+      "anonId": {
+        "heading": "Teilnehmer-ID",
+        "body": "Bitte geben Sie die Teilnehmer-ID ein, die Sie vom Forschungsteam erhalten haben.",
+        "label": "Teilnehmer-ID",
+        "placeholder": "z. B. P-0123",
+        "required": "Bitte geben Sie Ihre Teilnehmer-ID ein, um fortzufahren.",
+        "next": "Weiter"
+      },
+      "survey": {
+        "continue": "Weiter",
+        "required": "Bitte beantworten Sie alle Pflichtfragen.",
+        "likertLow": "Stimme überhaupt nicht zu",
+        "likertHigh": "Stimme voll und ganz zu"
+      },
+      "task": {
+        "brief": "Ordnen Sie die sechs Einträge nach Dringlichkeit – der dringendste oben.",
+        "inbox": "Eingang – neue Einträge",
+        "remaining": "{n} übrig",
+        "ladder": "Dringlichkeits-Rangfolge – Einträge hierher ziehen",
+        "allPlaced": "Alle Einträge platziert.",
+        "mostUrgent": "Am dringendsten",
+        "leastUrgent": "Am wenigsten dringend",
+        "confirm": "Rangfolge bestätigen",
+        "progress": "KI-Interaktion {n} von {total}",
+        "start": "Start",
+        "info": "Wie funktioniert das?",
+        "thought": "Die Überlegung der KI",
+        "thoughtIntro": "Fahren Sie über die Sprechblase auf einer Karte, um die Überlegung der KI dazu zu lesen."
+      },
+      "end": {
+        "title": "Vielen Dank für Ihre Teilnahme!",
+        "note": "Ihre Sitzung ist abgeschlossen. Sie können dieses Fenster jetzt schließen."
+      },
+      "lang": {
+        "label": "Sprache"
+      }
     },
-    "mid": {
-      "kicker": "About the interaction you just used",
-      "title": "Mid-questionnaire (placeholder)",
-      "questions": [
-        { "id": "mid_q1", "type": "likert", "label": "Placeholder: I felt in control during this task.", "required": false },
-        { "id": "mid_q2", "type": "likert", "label": "Placeholder: I trusted the AI's suggestions.", "required": false }
-      ]
+    "interactions": {
+      "hint": {
+        "badge": "Hinweis",
+        "title": "Die KI gibt Ihnen einen Hinweis",
+        "intro": "Wenn Sie eine Karte aufnehmen, hebt die KI den Platz hervor, den sie für diese Karte vorschlägt. Sie gibt nur Hinweise – wo jede Karte landet, entscheiden Sie.",
+        "footer": "Nehmen Sie eine Karte auf, um den Vorschlag der KI zu sehen."
+      },
+      "magnet": {
+        "badge": "Magnet",
+        "title": "Die KI zieht Ihre Karten an",
+        "intro": "Nehmen Sie eine Karte auf und bewegen Sie sie in die Rangfolge. Kommt die Karte in die Nähe des Platzes, den die KI vorschlägt, zieht die KI sie dorthin. Sie können sie trotzdem jederzeit woanders ablegen: Bewegen Sie die Karte einfach weiter dorthin, wo Sie sie haben möchten.",
+        "footer": "In der Nähe ihres vorgeschlagenen Platzes zieht die KI die Karte an. Weiterbewegen, um sie woanders abzulegen."
+      },
+      "radial": {
+        "badge": "Optionen",
+        "title": "Die KI bietet zwei Optionen an",
+        "intro": "Bleiben Sie mit dem Zeiger auf einer Karte im Eingang, und die KI öffnet daneben zwei Platzierungsoptionen. Fahren Sie über eine Option für eine Vorschau, klicken Sie, um die Karte zu platzieren. Oder ignorieren Sie die Optionen und ziehen Sie die Karte selbst.",
+        "footer": "Die KI schlägt zwei Plätze vor – wählen Sie einen oder ziehen Sie die Karte selbst."
+      },
+      "heatmap": {
+        "badge": "Heatmap",
+        "title": "Die KI zeigt, wie wahrscheinlich jeder Platz ist",
+        "intro": "Fahren Sie über eine Karte, und jeder Platz der Rangfolge leuchtet violett auf: Je kräftiger das Violett, desto wahrscheinlicher gehört die Karte nach Ansicht der KI dorthin. Es ist nur ein Vorschlag – jede Karte platzieren Sie selbst.",
+        "footer": "Weniger wahrscheinlich",
+        "footerHot": "Wahrscheinlicher",
+        "mostLikely": "Am wahrscheinlichsten"
+      },
+      "handoff": {
+        "badge": "Übergabe",
+        "title": "Die KI übernimmt in ihrer Zone",
+        "intro": "Ziehen Sie Karten selbst in die Rangfolge. Damit die KI weitermacht, lassen Sie Ihren Zeiger in der KI-Zone unten ruhen: Sie übernimmt den Zeiger und sortiert weiter. Verlassen Sie die Zone jederzeit, um die Kontrolle zurückzuholen.",
+        "you": "Sie haben die Kontrolle",
+        "ai": "KI sortiert",
+        "zone": {
+          "idle": "Zeiger hier ruhen lassen, damit die KI übernimmt",
+          "active": "KI sortiert … Zone verlassen, um zu übernehmen",
+          "done": "Alle Karten sind platziert"
+        }
+      },
+      "override": {
+        "badge": "Überprüfung",
+        "title": "Erst sortieren – dann prüft die KI",
+        "intro": "Ordnen Sie zuerst alle sechs Einträge selbst. Wenn Sie fertig sind, übergeben Sie Ihre Rangfolge an die KI. Die KI prüft sie und ändert, was sie anders sieht.",
+        "handOver": "An die KI übergeben",
+        "sortFirst": "Ordnen Sie alle sechs Einträge und übergeben Sie sie dann an die KI.",
+        "working": "Die KI prüft Ihre Rangfolge …",
+        "done": "Die KI hat {n} Ihrer Platzierungen geändert.",
+        "doneEdit": "Die KI hat {n} Ihrer Platzierungen geändert. Sie können die Rangfolge vor dem Bestätigen noch anpassen."
+      }
     },
-    "final": {
-      "kicker": "Almost done",
-      "title": "Final screener (placeholder)",
-      "questions": [
-        { "id": "final_q1", "type": "likert", "label": "Placeholder: Overall, working with the AI was pleasant.", "required": false },
-        { "id": "final_q2", "type": "text",   "label": "Placeholder: Which interaction did you prefer, and why?", "required": false }
-      ]
+    "surveys": {
+      "pre": {
+        "kicker": "Bevor wir beginnen",
+        "title": "Ihre Erfahrung mit KI",
+        "intro": "Bitte bewerten Sie jede Aussage auf einer Skala von 1 bis 7.",
+        "questions": [
+          {
+            "id": "pre_trust_general",
+            "type": "likert",
+            "scale": 7,
+            "label": "Ich vertraue KI-Systemen im Allgemeinen.",
+            "required": true
+          },
+          {
+            "id": "pre_reliable",
+            "type": "likert",
+            "scale": 7,
+            "label": "KI-Systeme sind im Allgemeinen zuverlässig.",
+            "required": true
+          },
+          {
+            "id": "pre_rely_comfort",
+            "type": "likert",
+            "scale": 7,
+            "label": "Ich fühle mich wohl dabei, mich auf Empfehlungen einer KI zu verlassen.",
+            "required": true
+          },
+          {
+            "id": "pre_use_freq",
+            "type": "likert",
+            "scale": 7,
+            "label": "Wie oft nutzen Sie KI-Werkzeuge?",
+            "required": true,
+            "anchors": [
+              "Nie",
+              "Sehr oft"
+            ]
+          },
+          {
+            "id": "pre_familiarity",
+            "type": "likert",
+            "scale": 7,
+            "label": "Wie vertraut sind Sie mit KI-Systemen?",
+            "required": true,
+            "anchors": [
+              "Überhaupt nicht vertraut",
+              "Sehr vertraut"
+            ]
+          },
+          {
+            "id": "pre_eval_confidence",
+            "type": "likert",
+            "scale": 7,
+            "label": "Wie sicher fühlen Sie sich darin, Ergebnisse einer KI zu beurteilen?",
+            "required": true,
+            "anchors": [
+              "Überhaupt nicht sicher",
+              "Sehr sicher"
+            ]
+          },
+          {
+            "id": "pre_use_work",
+            "type": "likert",
+            "scale": 7,
+            "label": "Wie oft nutzen Sie KI für berufliche Aufgaben?",
+            "required": true,
+            "anchors": [
+              "Nie",
+              "Sehr oft"
+            ]
+          }
+        ]
+      },
+      "mid": {
+        "kicker": "Zur Interaktion, die Sie gerade genutzt haben · {badge}",
+        "title": "Wie war die Arbeit mit dieser KI?",
+        "intro": "Bitte bewerten Sie jede Aussage auf einer Skala von 1 (stimme überhaupt nicht zu) bis 7 (stimme voll und ganz zu).",
+        "questions": [
+          {
+            "id": "mid_understood",
+            "type": "likert",
+            "scale": 7,
+            "label": "Ich habe verstanden, wie die KI mich unterstützt hat.",
+            "required": true
+          },
+          {
+            "id": "mid_clear_why",
+            "type": "likert",
+            "scale": 7,
+            "label": "Es war klar, warum sich die KI so verhalten hat.",
+            "required": true
+          },
+          {
+            "id": "mid_control",
+            "type": "likert",
+            "scale": 7,
+            "label": "Ich hatte das Gefühl, das Endergebnis unter Kontrolle zu haben.",
+            "required": true
+          },
+          {
+            "id": "mid_influence",
+            "type": "likert",
+            "scale": 7,
+            "label": "Die KI hat meine Entscheidungen beeinflusst.",
+            "required": true
+          },
+          {
+            "id": "mid_capable",
+            "type": "likert",
+            "scale": 7,
+            "label": "Die KI schien in der Lage, mir bei dieser Aufgabe zu helfen.",
+            "required": true
+          },
+          {
+            "id": "mid_helpful",
+            "type": "likert",
+            "scale": 7,
+            "label": "Die Unterstützung durch die KI war hilfreich.",
+            "required": true
+          },
+          {
+            "id": "mid_easier",
+            "type": "likert",
+            "scale": 7,
+            "label": "Diese Interaktion hat es leichter gemacht, die Aufgabe zu erledigen.",
+            "required": true
+          },
+          {
+            "id": "mid_natural",
+            "type": "likert",
+            "scale": 7,
+            "label": "Die Zusammenarbeit mit der KI fühlte sich natürlich an.",
+            "required": true
+          },
+          {
+            "id": "mid_rely_again",
+            "type": "likert",
+            "scale": 7,
+            "label": "Ich würde mich bei einer ähnlichen Aufgabe auf diese Art von KI-Unterstützung verlassen.",
+            "required": true
+          }
+        ]
+      }
     }
   }
 }

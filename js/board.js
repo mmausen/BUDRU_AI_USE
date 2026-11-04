@@ -19,6 +19,17 @@
 
    Every global listener or timer a module needs goes through b.listen() /
    b.onDestroy(), so Task.stop() can tear an interaction down completely.
+
+   LOGGING lives here, so every interaction gets it the same way:
+     b.place(id, from, to, meta)  → "place" event; meta.by = "participant" (default)
+                                    | "ai", meta.method = "drag" (default) | "option" | "ai",
+                                    plus any interaction-specific fields
+     b.returnToInbox(id, from)    → "unplace" event
+     b.notePickup(id, from)       → "pickup" event (the default drag calls it; modules
+                                    with their own drag call it themselves)
+     thought bubbles              → "thought_read" event with how long it was open
+   b.stats counts all of it for the per-interaction result (Task.confirm);
+   modules add their own counters under b.stats.ai.
    ═══════════════════════════════════════════════════════════════════ */
 window.Board = (function () {
   const DRAG_THRESHOLD = 5;   // px before a press becomes a drag
@@ -45,7 +56,12 @@ window.Board = (function () {
       slots: [null, null, null, null, null, null],
       drag: null,
       locked: false,           // true → the participant cannot pick anything up
+      stats: { pickups: 0, placedByParticipant: 0, placedByAi: 0, participantOnAiSlot: 0,
+               returnsToInbox: 0, thoughtsRead: 0, ai: {} },
     };
+    // Logged cards are tile keys (as in tasks/*.json), slots 1-based.
+    const keyOf = id => (byId[id] ? byId[id].key : id);
+    const slotNo = s => (s === "inbox" || s == null ? s : s + 1);
 
     /* ── markup ── */
     const root = document.createElement("div");
@@ -169,7 +185,7 @@ window.Board = (function () {
        b.thoughtOpen tells the interactions someone is reading (handoff pauses). */
     const thoughtEl = q(".t-thought");
     const THOUGHT_SVG = '<svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 2.5h10a1.5 1.5 0 0 1 1.5 1.5v6A1.5 1.5 0 0 1 13 11.5H7.5L4.5 14v-2.5H3A1.5 1.5 0 0 1 1.5 10V4A1.5 1.5 0 0 1 3 2.5z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><circle cx="5.3" cy="7" r=".95" fill="currentColor"/><circle cx="8" cy="7" r=".95" fill="currentColor"/><circle cx="10.7" cy="7" r=".95" fill="currentColor"/></svg>';
-    let thoughtTimer = null;
+    let thoughtTimer = null, thoughtCard = null, thoughtAt = 0;
     b.thoughtOpen = false;
     function addThoughtChip(div, card) {
       const chip = document.createElement("button");
@@ -198,21 +214,26 @@ window.Board = (function () {
       thoughtEl.style.left = x + "px";
       thoughtEl.style.top = y + "px";
       b.thoughtOpen = true;
-      // Not logged yet. Hook: Store.log("thought", { interaction: opts.key, tile: card.id });
+      thoughtCard = card.id; thoughtAt = performance.now();
     }
     function closeThought() {
       clearTimeout(thoughtTimer);
       thoughtEl.hidden = true;
       b.thoughtOpen = false;
+      if (thoughtCard) {
+        b.stats.thoughtsRead++;
+        Store.log("thought_read", { card: keyOf(thoughtCard), ms: Math.round(performance.now() - thoughtAt) });
+        thoughtCard = null;
+      }
     }
-    cleanups.push(() => clearTimeout(thoughtTimer));
+    cleanups.push(closeThought);
     // Any press outside a chip (picking up a card included) closes the bubble.
     root.addEventListener("mousedown", e => { if (!e.target.closest(".card-thought")) closeThought(); }, true);
 
     /* ── state ── */
     // Place `id` (from the inbox or slot `from`) into slot `toSlot`. An occupant
     // goes back to the inbox, or — for a slot-to-slot move — swaps places.
-    function place(id, from, toSlot) {
+    function place(id, from, toSlot, meta) {
       const displaced = b.slots[toSlot];
       if (displaced === id) return;
       b.slots[toSlot] = id;
@@ -222,10 +243,33 @@ window.Board = (function () {
       } else {
         b.slots[from] = displaced || null;
       }
+      const m = Object.assign({ by: "participant", method: "drag" }, meta);
+      const aiSlot = aiRanking.indexOf(id);
+      if (m.by === "ai") b.stats.placedByAi++;
+      else {
+        b.stats.placedByParticipant++;
+        if (toSlot === aiSlot) b.stats.participantOnAiSlot++;
+        Store.markFirst("firstMoveAt");          // a click-to-place (radial) has no pick-up
+      }
+      Store.markFirst("firstPlacementAt");
+      Store.log("place", Object.assign({}, m, {
+        card: keyOf(id), from: slotNo(from), to: slotNo(toSlot),
+        aiSlot: slotNo(aiSlot), toAiSlot: toSlot === aiSlot,
+        displaced: displaced ? keyOf(displaced) : null,
+        displacedTo: displaced ? (from === "inbox" ? "inbox" : slotNo(from)) : null,
+      }));
     }
-    function returnToInbox(id, fromSlot) {
+    function returnToInbox(id, fromSlot, meta) {
       b.slots[fromSlot] = null;
       if (!b.inbox.some(c => c.id === id)) b.inbox.push(byId[id]);
+      b.stats.returnsToInbox++;
+      Store.log("unplace", Object.assign({ by: "participant" }, meta, { card: keyOf(id), from: slotNo(fromSlot) }));
+    }
+    // The participant picked a card up (a drag has started).
+    function notePickup(id, from) {
+      b.stats.pickups++;
+      Store.markFirst("firstMoveAt");
+      Store.log("pickup", { card: keyOf(id), from: slotNo(from) });
     }
 
     /* ── geometry & hit-testing (viewport coordinates) ── */
@@ -282,6 +326,7 @@ window.Board = (function () {
         ghostApi.show(d.id, d.srcW);
         const src = cardElOf(d.id);
         if (src) src.classList.add("ghost");
+        notePickup(d.id, d.from);
         if (opts.onDragStart) opts.onDragStart(d);
       }
       highlightSlotAt(e.clientX, e.clientY);
@@ -319,7 +364,7 @@ window.Board = (function () {
     }
 
     Object.assign(b, {
-      render, updateConfirm, place, returnToInbox,
+      render, updateConfirm, place, returnToInbox, notePickup, keyOf, slotNo,
       slotAt, inInboxAt, highlightSlotAt, clearHighlight, slotEl, cardEl: cardElOf, centerOf,
       ghost: ghostApi, isFull: () => b.slots.every(Boolean),
       aiSlot: id => aiRanking.indexOf(id),

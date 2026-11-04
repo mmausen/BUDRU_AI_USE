@@ -1,7 +1,7 @@
 /* ═══════════════════════════════════════════════════════════════════
    FLOW — the step machine. One linear sequence:
 
-     anonId → pre → [AI 1 → mid] → [AI 2 → mid] … [AI 6 → mid] → final → end
+     anonId → pre → [AI 1 → mid] → [AI 2 → mid] … [AI 6 → mid] → end
 
    Optional steps are switched in Config.STEPS; which interactions run, and
    in what order, is Config.INTERACTIONS. build() leaves the disabled ones
@@ -29,7 +29,6 @@ window.Flow = (function () {
                                     after: key, label: `Mid-questionnaire ${n}` });
     });
 
-    if (S.finalSurvey) steps.push({ type: "survey", id: "final", label: "Final screener" });
     steps.push({ type: "end", label: "Thank you" });
   }
 

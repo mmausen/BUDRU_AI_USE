@@ -11,23 +11,24 @@ window.Config = (function () {
     devMode: true,                 // bottom-right dev bar: "Skip ▸", a jump-to-step picker
                                    //   and the interaction tuning controls in each task footer.
                                    //   Prototyping aid only — MUST be false for real participants.
-    loggingEnabled: false,         // MASTER SWITCH for the logging pipeline. false → Store.log
-                                   //   records nothing and nothing is POSTed. The session still
-                                   //   autosaves to localStorage. No study events are emitted
-                                   //   yet anyway — see README "Logging".
+    fileLogging: false,            // SAVE LOG FILES on the machine running server.js (npm start).
+                                   //   true → each participant gets a folder
+                                   //   <YYYY-MM-DD_HH-MM-SS>_<ID>/session.json in the log directory
+                                   //   in the project's logs/ folder (git-ignored) once their ID is entered.
+                                   //   false → nothing is sent; the session only autosaves to
+                                   //   localStorage. See README "Logging".
   };
 
   /* ═══ which steps the session runs ════════════════════════════════
      Every non-task step can be switched off. Order when all are on:
 
-       anonId → pre → [AI 1 → mid] … [AI 6 → mid] → final → end
+       anonId → pre → [AI 1 → mid] … [AI 6 → mid] → end
 
      The AI interactions themselves are switched in INTERACTIONS below. */
   const STEPS = {
     anonId:      true,   // ask for the participant ID the research team issued
-    preSurvey:   true,   // placeholder questionnaire before the first interaction
-    midSurvey:   true,   // placeholder questionnaire after EVERY interaction
-    finalSurvey: true,   // placeholder final screener after the last mid-survey
+    preSurvey:   true,   // baseline questionnaire (7 ratings) before the first interaction
+    midSurvey:   true,   // questionnaire (9 ratings) after EVERY interaction
   };
 
   /* ═══ the AI interactions ═════════════════════════════════════════
@@ -50,9 +51,19 @@ window.Config = (function () {
        "prio"        — prioritisation with a preferred order that leaves
                        room for interpretation (6 tasks)
      The AI recommends each task's `target-order`; the heatmap shows each
-     tile's `heat` row. In devMode the dev bar's picker overrides both settings. */
+     tile's `heat` row. In devMode the dev bar's picker overrides the set. */
   const TASK_SET = "placeholder";
-  const TASK_LANG = "en";          // task content language: "de" | "en"
+
+  /* ═══ language ════════════════════════════════════════════════════
+     One language for everything: interface text, questionnaires and task
+     content (strings.json and tasks/*.json carry "en" and "de").
+       default  — the language a new participant starts in
+       switcher — show the EN / DE switch (top right, on every screen).
+                  A participant's choice is remembered in their browser. */
+  const LANG = {
+    default: "en",
+    switcher: true,
+  };
 
   /* Which task each interaction gets.
        false — interaction n runs task n of the set (same for everyone)
@@ -83,6 +94,6 @@ window.Config = (function () {
   // Where Store.sendRemote() posts the session. "" → localStorage only.
   const ENDPOINT_URL = "/collect-logs";
 
-  return { CONFIG, STEPS, INTERACTIONS, TASK_SET, TASK_LANG, RANDOM_TASK_ASSIGNMENT, THOUGHTS,
+  return { CONFIG, STEPS, INTERACTIONS, TASK_SET, LANG, RANDOM_TASK_ASSIGNMENT, THOUGHTS,
            OVERRIDE, ENDPOINT_URL };
 })();

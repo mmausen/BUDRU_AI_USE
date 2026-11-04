@@ -50,10 +50,14 @@ input,textarea{font-family:inherit;-webkit-user-select:text;user-select:text}
 .q{display:flex;flex-direction:column;gap:9px}
 .q-label{font-size:14.5px;font-weight:600}
 .q-text{border:1px solid var(--line);border-radius:7px;padding:9px 11px;font-size:14px;outline:none;resize:vertical}
-.likert{display:flex;gap:16px}
-.likert-opt{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;font-size:13px;color:var(--txt2)}
-.likert-opt input{width:17px;height:17px;cursor:pointer}
-.likert-anchors{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);max-width:290px}
+.survey-intro{font-size:14px;color:var(--txt2);line-height:1.55;margin-top:-10px}
+/* 1…7 rating: the end labels span exactly the width of the option row */
+.likert-scale{display:inline-flex;flex-direction:column;gap:5px;align-self:flex-start}
+.likert{display:flex;gap:22px}
+.likert-opt{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;font-size:13px;color:var(--txt2);min-width:20px}
+.likert-opt input{width:17px;height:17px;cursor:pointer;accent-color:#111}
+.likert-anchors{display:flex;justify-content:space-between;gap:16px;font-size:11.5px;color:var(--muted)}
+.likert-anchors span:last-child{text-align:right}
 .survey-footer{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:8px}
 
 /* ── task frame ── */
@@ -195,6 +199,15 @@ input,textarea{font-family:inherit;-webkit-user-select:text;user-select:text}
 .card.ai-moved{border-color:var(--ai-b);box-shadow:0 0 0 2px var(--ai-l),0 1px 2px rgba(0,0,0,.06)}
 .ai-tag{position:absolute;top:-8px;left:12px;font-size:9.5px;font-weight:800;letter-spacing:.06em;color:#fff;
   background:var(--ai);padding:2px 6px;border-radius:4px}
+
+/* ── language switch (participant-facing, top right on every screen) ── */
+#lang-switch{position:fixed;top:8px;right:12px;z-index:9950;display:flex;gap:2px;background:#fff;
+  border:1px solid var(--line);border-radius:999px;padding:3px}
+#lang-switch button{font:inherit;font-size:11.5px;font-weight:700;letter-spacing:.06em;border:0;background:none;
+  color:var(--muted);padding:3px 10px;border-radius:999px;cursor:pointer}
+#lang-switch button:hover{color:var(--txt)}
+#lang-switch button.on{background:#111;color:#fff}
+body.has-lang #dev-bar{right:104px}
 
 /* ── dev bar ── */
 #dev-bar{position:fixed;right:12px;top:4px;z-index:9900;display:flex;align-items:center;gap:8px;

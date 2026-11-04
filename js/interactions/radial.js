@@ -4,6 +4,8 @@
    two placement options beside the pointer: the AI's slot and a plausible
    decoy drawn from the tile's heat row, looking identical and in random
    order. Hover an option to preview, click to place. Or ignore the menu and drag the card by hand.
+   Logs "options_shown" (both slots); a click places with method "option" and
+   option "ai" | "decoy"; a hand drag places with method "drag".
    ═══════════════════════════════════════════════════════════════════ */
 Interactions.register("radial", {
   mount(container, ctx) {
@@ -46,8 +48,10 @@ Interactions.register("radial", {
         div.addEventListener("mouseleave", () => onCardLeave(card.id));
       },
       onDragStart() { closeMenu(true); },
+      onDragEnd(d) { if (b.slots.includes(d.id) && d.from === "inbox") b.stats.ai.placedByDrag++; },
       onConfirm: ctx.onConfirm,
     });
+    b.stats.ai = { optionsShown: 0, choseAiOption: 0, choseDecoy: 0, placedByDrag: 0 };
     b.$(".t-note").textContent = S.t("interactions.radial.footer");
 
     const layer = document.createElement("div");
@@ -82,6 +86,9 @@ Interactions.register("radial", {
       const ay = hover.lastY != null ? hover.lastY : r.top + r.height / 2;
       const options = Board.shuffle([{ slot: s.trueSlot, correct: true }, { slot: s.decoy, correct: false }]);
       options[0].dy = -42; options[1].dy = 42;
+      b.stats.ai.optionsShown++;
+      Store.log("options_shown", { card: b.keyOf(id), aiSlot: s.trueSlot + 1, decoySlot: s.decoy + 1,
+                                   top: options[0].correct ? "ai" : "decoy" });
 
       hover.els = options.map(p => {
         const btn = document.createElement("div");
@@ -104,7 +111,8 @@ Interactions.register("radial", {
           hover.hideTimer = setTimeout(() => closeMenu(), CFG.hideDelay);
         });
         btn.addEventListener("click", () => {
-          b.place(id, "inbox", p.slot);
+          b.stats.ai[p.correct ? "choseAiOption" : "choseDecoy"]++;
+          b.place(id, "inbox", p.slot, { method: "option", option: p.correct ? "ai" : "decoy" });
           closeMenu(true);
           b.render();
         });

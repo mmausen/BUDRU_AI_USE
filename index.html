@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>DFKI · AI Use</title>
-<link rel="stylesheet" href="styles.css?v=10"/>
+<link rel="stylesheet" href="styles.css?v=11"/>
 </head>
 <body>
 
@@ -44,6 +44,7 @@
   <div class="centered survey-wrap">
     <h1 class="screen-kicker" id="survey-kicker"></h1>
     <h2 id="survey-title"></h2>
+    <p class="survey-intro" id="survey-intro" hidden></p>
     <form id="survey-form" class="survey-form" onsubmit="return false"></form>
     <div class="survey-footer">
       <span class="form-error" id="survey-note"></span>
@@ -82,12 +83,17 @@
   </div>
 </section>
 
+<!-- ════════════ LANGUAGE ════════════ participant-facing, every screen (Config.LANG.switcher) -->
+<div id="lang-switch" role="group" aria-label="Language / Sprache" hidden>
+  <button type="button" data-lang="en" lang="en">EN</button>
+  <button type="button" data-lang="de" lang="de">DE</button>
+</div>
+
 <!-- ════════════ DEV BAR ════════════ only with Config.CONFIG.devMode -->
 <div id="dev-bar" hidden>
   <span class="dev-tag">DEV</span>
   <select id="dev-jump" title="Jump to step"></select>
   <select id="dev-taskset" title="Task set"></select>
-  <select id="dev-tasklang" title="Task language"><option value="en">EN</option><option value="de">DE</option></select>
   <button type="button" id="dev-skip" title="Next step (Shift + →)">Skip ▸</button>
   <button type="button" id="dev-params" title="Show / hide this interaction's parameters">Params</button>
   <button type="button" id="dev-restart" title="Start a fresh session">Restart</button>
@@ -95,21 +101,21 @@
 <!-- the running interaction's tuning controls (Board → Dev.mountTune); dev only -->
 <div id="dev-tune" hidden></div>
 
-<script src="js/config.js?v=3"></script>
-<script src="js/strings.js?v=3"></script>
-<script src="js/store.js?v=3"></script>
-<script src="js/tasks.js?v=3"></script>
-<script src="js/board.js?v=4"></script>
+<script src="js/config.js?v=7"></script>
+<script src="js/strings.js?v=4"></script>
+<script src="js/store.js?v=6"></script>
+<script src="js/tasks.js?v=4"></script>
+<script src="js/board.js?v=5"></script>
 <script src="js/ai-cursor.js?v=4"></script>
-<script src="js/interactions/hint.js?v=3"></script>
-<script src="js/interactions/magnet.js?v=13"></script>
-<script src="js/interactions/radial.js?v=4"></script>
-<script src="js/interactions/heatmap.js?v=4"></script>
-<script src="js/interactions/handoff.js?v=9"></script>
-<script src="js/interactions/override.js?v=3"></script>
-<script src="js/task.js?v=3"></script>
-<script src="js/screens.js?v=3"></script>
-<script src="js/flow.js?v=3"></script>
-<script src="js/main.js?v=4"></script>
+<script src="js/interactions/hint.js?v=4"></script>
+<script src="js/interactions/magnet.js?v=14"></script>
+<script src="js/interactions/radial.js?v=5"></script>
+<script src="js/interactions/heatmap.js?v=6"></script>
+<script src="js/interactions/handoff.js?v=10"></script>
+<script src="js/interactions/override.js?v=4"></script>
+<script src="js/task.js?v=5"></script>
+<script src="js/screens.js?v=6"></script>
+<script src="js/flow.js?v=4"></script>
+<script src="js/main.js?v=6"></script>
 </body>
 </html>

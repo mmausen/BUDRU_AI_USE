@@ -1,17 +1,24 @@
 /* ═══════════════════════════════════════════════════════════════════
-   COLLECTOR — serves the prototype and saves each session to ./logs.
-   Carried over unchanged in behaviour from the designing-trust prototype.
+   COLLECTOR — serves the prototype and saves each session as files on
+   this machine (client switch: Config.CONFIG.fileLogging).
 
    One endpoint:
-     POST /collect-logs  → session snapshot + event stream.
+     POST /collect-logs  → session snapshot (+ event stream, if any).
 
-   1. The client POSTs the WHOLE session at every step boundary, so only
-      events the server has not seen yet are appended to the JSONL stream;
-      the per-participant snapshot is the record of truth.
-   2. One FOLDER per participant (events.jsonl + sessions/<id>.json), so a
-      run can be handed on or deleted as a unit.
-   3. participantId is sanitised before it touches a path.
+   1. The client POSTs the WHOLE session at every step boundary, so the
+      snapshot is always complete; only events not yet on disk are appended
+      to the JSONL stream.
+   2. One FOLDER per participant, named <timestamp>_<participant ID>. It is
+      only created once the participant has typed their ID — until then the
+      session carries no `logFolder` and nothing is written.
+   3. The folder name is sanitised before it touches a path.
    4. No IP address is recorded anywhere.
+
+   The log directory is ./logs inside the project. It is git-ignored as a
+   whole (/logs/ in .gitignore), so it is never committed or pushed, and
+   checkout / pull / reset leave it alone. It is never served over HTTP.
+   If it — or a participant's folder — is deleted, it is simply made again:
+   at start-up, and before every write. Override with LOG_DIR=/some/path.
 
    Run:  npm install && npm start        (or: PORT=8080 node server.js)
    ═══════════════════════════════════════════════════════════════════ */
@@ -21,32 +28,32 @@ const fsp = require("fs/promises");
 const path = require("path");
 
 const PORT = process.env.PORT || 8080;
-const LOG_DIR = path.join(__dirname, "logs");
+const LOG_DIR = path.resolve(process.env.LOG_DIR || path.join(__dirname, "logs"));
 
 /* ── one folder per participant ──────────────────────────────────────
-       logs/<participantId>/events.jsonl
-       logs/<participantId>/sessions/<participantId>.json
+       <LOG_DIR>/<YYYY-MM-DD_HH-MM-SS>_<participant ID>/session.json
+       <LOG_DIR>/<YYYY-MM-DD_HH-MM-SS>_<participant ID>/events.jsonl   (only once events exist)
 
    Everything from one person's run sits together, so a single run can be
    handed on, archived or deleted as a unit — which is what a participant
-   withdrawing actually requires.
+   withdrawing actually requires. The timestamp is when the ID was entered.
  */
-const runDir      = id => path.join(LOG_DIR, id);
-const sessionFile = id => path.join(runDir(id), "sessions", id + ".json");
-const eventLog    = id => path.join(runDir(id), "events.jsonl");
+const runDir      = folder => path.join(LOG_DIR, folder);
+const sessionFile = folder => path.join(runDir(folder), "session.json");
+const eventLog    = folder => path.join(runDir(folder), "events.jsonl");
 
 
 /* No IP address is ever recorded. An IP is personal data under GDPR and
    would pull this study into heavier consent/retention obligations for no
    research benefit — the participant id already links the rows. */
 
-fs.mkdirSync(LOG_DIR, { recursive: true });   // each participant's folder is made on their first sync
+fs.mkdirSync(LOG_DIR, { recursive: true });   // each participant's folder is made once their ID is in
 
 const app = express();
 app.use(express.json({ limit: "25mb" }));
 
 /* The logs live inside the served directory, so serve nothing from them —
-   otherwise GET /logs/<id>.json hands one participant another's data. */
+   otherwise GET /logs/<folder>/session.json hands one participant another's data. */
 app.use((req, res, next) => {
   const p = decodeURIComponent(req.path).replace(/\\/g, "/");
   if (/^\/(logs|_archive|node_modules)(\/|$)/.test(p) || p.includes("..")) {
@@ -56,10 +63,9 @@ app.use((req, res, next) => {
 });
 app.use(express.static(__dirname, { dotfiles: "ignore", index: "index.html" }));
 
-/* participantId → a safe, non-empty filename stem. */
-function safeId(raw) {
-  const id = String(raw == null ? "" : raw).replace(/[^A-Za-z0-9_-]/g, "").slice(0, 64);
-  return id || "unknown";
+/* logFolder → a safe folder name (letters, digits, - and _ only), or "" if nothing is left. */
+function safeFolder(raw) {
+  return String(raw == null ? "" : raw).replace(/[^A-Za-z0-9_-]/g, "").slice(0, 96);
 }
 
 /* Serialise writes per participant: two step boundaries can arrive close
@@ -86,15 +92,19 @@ app.post("/collect-logs", async (req, res) => {
     return res.status(400).json({ ok: false, error: "expected a session object" });
   }
 
-  const id = safeId(session.participantId);
+  // No participant ID yet → no folder yet. Acknowledge, write nothing.
+  const id = safeFolder(session.logFolder);
+  if (!id) return res.json({ ok: true, skipped: "no participant ID yet" });
+
   const snapshot = sessionFile(id);
   const receivedAt = new Date().toISOString();
   const events = Array.isArray(session.events) ? session.events : [];
 
   try {
     const appended = await queue(id, async () => {
-      // The participant's folder, made on their first sync and never again.
-      await fsp.mkdir(path.dirname(snapshot), { recursive: true });
+      // The participant's folder (and logs/ itself), made on their first sync after the ID —
+      // and again if either was deleted since: every write checks.
+      await fsp.mkdir(runDir(id), { recursive: true });
 
       // How many of this participant's events are already on disk?
       let known = 0;
@@ -113,7 +123,7 @@ app.post("/collect-logs", async (req, res) => {
       const fresh = events.slice(known);
       if (fresh.length) {
         const lines = fresh.map(ev => JSON.stringify({
-          participantId: id,
+          participant: session.anonId,
           lang: session.lang,
           ...ev,
           serverTimestamp: receivedAt,
@@ -124,7 +134,7 @@ app.post("/collect-logs", async (req, res) => {
     });
 
 
-    res.json({ ok: true, participantId: id, totalEvents: events.length, appendedEvents: appended });
+    res.json({ ok: true, folder: id, totalEvents: events.length, appendedEvents: appended });
   } catch (err) {
     console.error("save failed for", id, err);
     res.status(500).json({ ok: false, error: "write failed" });
@@ -136,7 +146,7 @@ app.get("/collect-logs/health", async (_req, res) => {
   let sessions = 0;
   try {
     const entries = await fsp.readdir(LOG_DIR, { withFileTypes: true });
-    sessions = entries.filter(e => e.isDirectory() && e.name !== "sessions").length;
+    sessions = entries.filter(e => e.isDirectory()).length;
   } catch (e) { /* none yet */ }
   res.json({ ok: true, logDir: LOG_DIR, sessions });
 });
@@ -158,6 +168,6 @@ app.use((err, req, res, _next) => {
 
 app.listen(PORT, () => {
   console.log(`BDR — AI-use prototype + collector on http://localhost:${PORT}`);
-  console.log(`one folder per participant under ${LOG_DIR}`);
-  console.log("  <participantId>/events.jsonl  +  <participantId>/sessions/<participantId>.json");
+  console.log(`log files (when Config.CONFIG.fileLogging is on): ${LOG_DIR}`);
+  console.log("  <YYYY-MM-DD_HH-MM-SS>_<participant ID>/session.json");
 });

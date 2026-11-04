@@ -16,9 +16,10 @@ function assignTasks() {
    the run while building or piloting it:
      Skip ▸     — the next step, from wherever you are (also mid-task)
      Jump to    — any step directly: an interaction, a questionnaire, the end
-     Tasks      — the task set (placeholder / fixed / prio) and the task
-                  language (DE / EN); a running task is rebuilt with the new one.
-                  The choice is remembered in this browser across reloads.
+     Tasks      — the task set (placeholder / fixed / prio); a running task is
+                  rebuilt with the new one. Remembered in this browser across
+                  reloads. (The language is the participant-facing EN / DE
+                  switch, not part of the dev bar.)
      Restart    — a fresh session from the first step
      Params     — shows / hides the running interaction's tuning controls
                   (magnet strength and radius, handoff speed, …) in a panel
@@ -50,13 +51,12 @@ window.Dev = (function () {
       sel.appendChild(opt);
     });
     sel.value = Tasks.set();
-    $("dev-tasklang").value = Tasks.lang();
   }
-  // Switch the task set / language; rebuild the task on screen so it shows at once.
-  function setTasks(set, lang) {
+  // Switch the task set; rebuild the task on screen so it shows at once.
+  function setTasks(set) {
     const before = Tasks.set();
-    Tasks.choose(set, lang);
-    Store.setTasks(Tasks.set(), Tasks.lang(), "dev");
+    Tasks.choose(set);
+    Store.setTasks(Tasks.set(), "dev");
     if (Tasks.set() !== before) assignTasks();   // the old ids belong to the old set
     const cur = Flow.current();
     if (cur && cur.type === "task") Flow.go(Flow.index());
@@ -90,8 +90,7 @@ window.Dev = (function () {
     $("dev-bar").hidden = false;
     fill();
     fillTasks();
-    $("dev-taskset").addEventListener("change", e => setTasks(e.target.value, null));
-    $("dev-tasklang").addEventListener("change", e => setTasks(null, e.target.value));
+    $("dev-taskset").addEventListener("change", e => setTasks(e.target.value));
     $("dev-skip").addEventListener("click", () => Flow.next());
     $("dev-jump").addEventListener("change", e => Flow.go(+e.target.value));
     $("dev-restart").addEventListener("click", restart);
@@ -122,11 +121,54 @@ window.Dev = (function () {
   function applyStaticText() {
     document.querySelectorAll("[data-s]").forEach(el => { el.textContent = S.t(el.getAttribute("data-s")); });
     $("anon-id-input").placeholder = S.t("ui.anonId.placeholder");
+    document.documentElement.lang = S.lang();
+  }
+
+  /* ── language: one choice for interface, questionnaires and tasks ──
+     Starts at Config.LANG.default, or the participant's last pick in this
+     browser. The EN / DE switch (Config.LANG.switcher) works on every screen:
+     static text and a questionnaire are relabelled in place (answers kept);
+     a running task is rebuilt in the new language. */
+  const LANG_KEY = "bdr_aiuse_lang";
+  function initLang() {
+    let saved = null;
+    try { saved = localStorage.getItem(LANG_KEY); } catch (e) { /* default */ }
+    applyLang(S.LANGS.includes(saved) ? saved : Config.LANG.default);
+  }
+  function applyLang(l) {
+    S.setLang(l);
+    Tasks.setLang(l);
+    applyStaticText();
+    document.querySelectorAll("#lang-switch [data-lang]").forEach(b => {
+      b.classList.toggle("on", b.dataset.lang === l);
+      b.setAttribute("aria-pressed", b.dataset.lang === l);
+    });
+  }
+  function switchLang(l) {
+    if (l === S.lang()) return;
+    try { localStorage.setItem(LANG_KEY, l); } catch (e) { /* ignore */ }
+    applyLang(l);
+    Store.setLang(l, true);
+    const cur = Flow.current();
+    if (!cur) return;
+    if (cur.type === "survey") Screens.relabel();
+    else if (cur.type === "task") Flow.go(Flow.index());
+  }
+  function wireLang() {
+    const el = $("lang-switch");
+    if (!Config.LANG.switcher) return;
+    el.hidden = false;
+    document.body.classList.add("has-lang");
+    el.addEventListener("click", e => {
+      const b = e.target.closest("[data-lang]");
+      if (b) switchLang(b.dataset.lang);
+    });
   }
 
   function startSession() {
     Store.newSession(genParticipantId());
-    Store.setTasks(Tasks.set(), Tasks.lang(), Tasks.set() === Config.TASK_SET && Tasks.lang() === Config.TASK_LANG ? "config" : "dev");
+    Store.setTasks(Tasks.set(), Tasks.set() === Config.TASK_SET ? "config" : "dev");
+    Store.setLang(S.lang());
     assignTasks();
     Flow.build();
     Flow.go(0);
@@ -141,17 +183,18 @@ window.Dev = (function () {
   }
 
   function boot() {
-    if (Config.CONFIG.loggingEnabled === false) {
-      console.warn("[BDR] logging is OFF (Config.CONFIG.loggingEnabled = false) — nothing is sent to logs/.");
+    if (!Config.CONFIG.fileLogging) {
+      console.warn("[BDR] file logging is OFF (Config.CONFIG.fileLogging = false) — no log files are written.");
     }
     Tasks.init();
-    console.log(`[BDR] task set "${Tasks.set()}" (${Tasks.lang()})`);
+    initLang();
+    console.log(`[BDR] task set "${Tasks.set()}", language ${S.lang()}`);
     Config.INTERACTIONS.forEach(k => {
       if (!Interactions.get(k)) console.error(`[BDR] Config.INTERACTIONS names "${k}", but no module registered it.`);
     });
     Store.flushArchive().then(n => { if (n) console.log(`[BDR] uploaded ${n} archived session(s)`); });
 
-    applyStaticText();
+    wireLang();
     Screens.wire();
     Task.wire();
 

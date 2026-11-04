@@ -8,6 +8,8 @@
    back: the AI cursor rushes to the participant's pointer and fades out, and
    a tile it was carrying goes back to the inbox untouched. The AI drops each
    tile in its own suggested slot.
+   Logs "ai_takeover" / "ai_takeback" (reason: left_zone | done | paused);
+   the AI's drops are placements with by "ai".
    ═══════════════════════════════════════════════════════════════════ */
 Interactions.register("handoff", {
   mount(container, ctx) {
@@ -53,6 +55,7 @@ Interactions.register("handoff", {
     // The zone floats over the lower centre of the board, straddling both columns.
     b.$(".t-main").insertAdjacentHTML("beforeend",
       '<div class="ai-zone"><span class="ai-zone-dot"></span><span class="ai-zone-label"></span></div>');
+    b.stats.ai = { takeovers: 0, takebacks: 0 };
     const zoneEl = b.$(".ai-zone"), zoneTxt = b.$(".ai-zone-label");
     if (b.$(".tune-speed")) {
       b.$(".tune-dwell").addEventListener("input", e => { CFG.dwellMs = +e.target.value; });
@@ -78,6 +81,7 @@ Interactions.register("handoff", {
         b.ghost.show(drag.id, drag.srcW);
         const src = b.cardEl(drag.id);
         if (src) src.classList.add("ghost");
+        b.notePickup(drag.id, drag.from);
       }
       b.highlightSlotAt(e.clientX, e.clientY);
       b.ghost.move(e.clientX - drag.offsetX, e.clientY - drag.offsetY);
@@ -110,7 +114,7 @@ Interactions.register("handoff", {
       lastPointer = { x: e.clientX, y: e.clientY };
       const inside = !drag && inZone(e.clientX, e.clientY);   // dragging a card over it never hands off
       if (inside && zoneSince == null) zoneSince = performance.now();
-      if (!inside) { zoneSince = null; if (fc.active) deactivate(); }
+      if (!inside) { zoneSince = null; if (fc.active) deactivate("left_zone"); }
     }
     function activate() {
       const r = b.root.getBoundingClientRect();
@@ -118,12 +122,16 @@ Interactions.register("handoff", {
       fc.returning = false;
       fc.x = lastPointer.x || (r.left + r.width / 2);
       fc.y = lastPointer.y || (r.top + r.height / 2);
-      // Not logged yet. Hook: Store.log("ai_took_over", { interaction: "handoff" });
+      b.stats.ai.takeovers++;
+      Store.log("ai_takeover", { placedSoFar: b.slots.filter(Boolean).length });
     }
-    function deactivate() {
+    function deactivate(reason) {
       fc.active = false;
       fc.queue.length = 0;
       fc.seg = null;
+      if (reason === "left_zone") b.stats.ai.takebacks++;
+      Store.log("ai_takeback", { reason: reason || "left_zone", placedSoFar: b.slots.filter(Boolean).length,
+                                 droppedCarry: fc.carrying != null ? b.keyOf(fc.carrying) : null });
       if (fc.carrying != null) {
         const src = b.$(`.t-inbox [data-id="${fc.carrying}"]`);
         if (src) src.classList.remove("ghost");   // never left the inbox — just un-dim it
@@ -131,7 +139,6 @@ Interactions.register("handoff", {
         fc.carrying = null;
       }
       b.clearHighlight();
-      // Not logged yet. Hook: Store.log("user_took_back", { interaction: "handoff" });
       // Rush the cursor back to the user's pointer before fading: "here, it's yours again".
       if (fc.opacity > 0.05) { fc.returning = true; fc.returnT = 0; fc.returnFrom = { x: fc.x, y: fc.y }; }
       else fc.returning = false;
@@ -225,7 +232,7 @@ Interactions.register("handoff", {
           b.ghost.hide();
           b.clearHighlight();
           AiCursor.pulse(cursorEl);
-          b.place(id, "inbox", s.slot);
+          b.place(id, "inbox", s.slot, { by: "ai", method: "ai" });
           b.render();
         }
         fc.seg = null;
@@ -246,7 +253,7 @@ Interactions.register("handoff", {
       const complete = b.isFull();
       // No takeover while the intro card is open (ctx.paused) — it would sort behind it.
       if (!complete && !fc.active && !drag && !ctx.paused() && zoneSince != null && (now - zoneSince) >= CFG.dwellMs) activate();
-      if ((complete || ctx.paused()) && fc.active) deactivate();
+      if ((complete || ctx.paused()) && fc.active) deactivate(complete ? "done" : "paused");
 
       const targetOp = (fc.active || fc.returning) ? 1 : 0;
       const rate = fc.active ? dt / CFG.fadeInMs : dt / CFG.fadeOutMs;

@@ -16,6 +16,10 @@
    itself plus the slot margins, never below the empty slot — so the field
    covers the same share of the ranking whatever the card size, task set or
    window width (narrow windows wrap the text and make cards taller).
+
+   Logs "magnet_snap" when the card is pulled fully onto the AI slot and
+   "magnet_release" when the participant pulls it back out; each drop says
+   whether it was released while snapped (accepted).
    ═══════════════════════════════════════════════════════════════════ */
 Interactions.register("magnet", {
   mount(container, ctx) {
@@ -36,6 +40,7 @@ Interactions.register("magnet", {
     const real = { x: 0, y: 0 }, fake = { x: 0, y: 0 }, vel = { x: 0, y: 0 };
     let cursorActive = false, rafId = null, lastTick = 0, slotH = 72;
     let drag = null;
+    let snapped = false;    // the dragged card currently held fully on the AI slot
 
     const b = Board.create(container, {
       key: "magnet",
@@ -50,6 +55,7 @@ Interactions.register("magnet", {
       cardDecor(div) { div.addEventListener("mousedown", onMouseDown); },
       onConfirm: ctx.onConfirm,
     });
+    b.stats.ai = { snaps: 0, snapsAccepted: 0, pulledAway: 0 };
     b.$(".t-note").textContent = S.t("interactions.magnet.footer");
     b.root.classList.add("no-cursor");
     b.root.insertAdjacentHTML("beforeend",
@@ -72,6 +78,14 @@ Interactions.register("magnet", {
       const el = t(".tune-readout");
       if (!el) return;
       el.textContent = `strength ${CFG.magnetStrength} · radius ${CFG.radiusSlots} slots = ${CFG.magnetRadius}px (slot ${slotH}px)`;
+    }
+
+    function setSnapped(on) {
+      if (on === snapped || !drag) return;
+      snapped = on;
+      const card = b.keyOf(drag.id);
+      if (on) { b.stats.ai.snaps++; Store.log("magnet_snap", { card, aiSlot: b.aiSlot(drag.id) + 1 }); }
+      else { b.stats.ai.pulledAway++; Store.log("magnet_release", { card }); }
     }
 
     /* ── magnet geometry ── */
@@ -106,11 +120,14 @@ Interactions.register("magnet", {
           const dist = Math.hypot(dx, dy) || 1;
           if (dist < CFG.magnetRadius) {
             let tx, ty;
-            if (CFG.snap && dist < CFG.magnetRadius * CFG.snapThreshold) { tx = snap.x; ty = snap.y; }
+            const inSnap = CFG.snap && dist < CFG.magnetRadius * CFG.snapThreshold;
+            setSnapped(inSnap);
+            if (inSnap) { tx = snap.x; ty = snap.y; }
             else { tx = a.x + dx * CFG.magnetStrength; ty = a.y + dy * CFG.magnetStrength; }
             return { x: tx - drag.anchorOffX, y: ty - drag.anchorOffY };
           }
         }
+        setSnapped(false);
       }
       return { x: real.x, y: real.y };
     }
@@ -210,6 +227,7 @@ Interactions.register("magnet", {
       b.ghost.show(drag.id, drag.srcW);
       const src = b.cardEl(drag.id);
       if (src) src.classList.add("ghost");
+      b.notePickup(drag.id, drag.from);
     }
     function onMouseUp() {
       b.clearHighlight();
@@ -222,7 +240,10 @@ Interactions.register("magnet", {
       // (the magnet anchor), the inbox by the cursor.
       const ax = fake.x + d.anchorOffX, ay = fake.y + d.anchorOffY;
       const target = slotUnder({ x: ax, y: ay }, d);
-      if (target != null) b.place(d.id, d.from, target);
+      const wasSnapped = snapped;
+      snapped = false;
+      if (wasSnapped && target === b.aiSlot(d.id)) b.stats.ai.snapsAccepted++;
+      if (target != null) b.place(d.id, d.from, target, { snapped: wasSnapped });
       else if (b.inInboxAt(fake.x, fake.y) && d.from !== "inbox") b.returnToInbox(d.id, d.from);
       b.render();
     }

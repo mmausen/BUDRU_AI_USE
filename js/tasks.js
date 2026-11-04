@@ -25,21 +25,22 @@ window.Tasks = (function () {
   function readDev() { try { return JSON.parse(localStorage.getItem(DEV_KEY) || "{}"); } catch (e) { return {}; } }
   function writeDev(v) { try { localStorage.setItem(DEV_KEY, JSON.stringify(v)); } catch (e) { /* ignore */ } }
 
-  // Config decides; in devMode the picker's last choice overrides it.
+  // Config decides the set; in devMode the picker's last choice overrides it.
+  // The language follows the interface (see setLang / main.js).
   function init() {
     const dev = Config.CONFIG.devMode ? readDev() : {};
     set = SETS.includes(dev.set) ? dev.set : Config.TASK_SET;
-    lang = ["de", "en"].includes(dev.lang) ? dev.lang : Config.TASK_LANG;
+    lang = Config.LANG.default;
     if (!data[set] || !(data[set].tasks || []).length) {
       console.error(`[BDR] task set "${set}" did not load — falling back to "placeholder".`);
       set = "placeholder";
     }
   }
-  function choose(newSet, newLang) {
+  function choose(newSet) {
     if (newSet && data[newSet]) set = newSet;
-    if (newLang) lang = newLang;
-    writeDev({ set, lang });
+    writeDev({ set });
   }
+  function setLang(l) { if (["de", "en"].includes(l)) lang = l; }
 
   const shuffle = a => {
     a = a.slice();
@@ -92,6 +93,6 @@ window.Tasks = (function () {
     };
   }
 
-  return { SETS, load, init, choose, assign, forRound,
+  return { SETS, load, init, choose, setLang, assign, forRound,
            set: () => set, lang: () => lang, has: name => !!data[name] };
 })();

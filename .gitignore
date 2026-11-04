@@ -1,7 +1,6 @@
-# participant data: never commit (only logs/.gitignore is tracked)
-logs/**/*.json
-logs/**/*.jsonl
-logs/**/*.tmp
+# Participant data (server.js writes it here). The whole folder is ignored:
+# never committed, never pushed. Careful: `git clean -x` would delete it.
+/logs/
 
 node_modules/
 package-lock.json

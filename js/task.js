@@ -7,8 +7,11 @@
    stop() tears the interaction down completely — listeners, rAF loops and
    timers included — which is what makes dev Skip / jump safe mid-task.
 
-   Results are NOT recorded yet (no data logging). The hook is the
-   commented Store.addResult call in confirm().
+   Records each interaction's start (Start pressed on the intro card) and
+   end (ranking confirmed) via Store.interactionStart / interactionEnd, sets
+   the logging context every board event is stamped with, and on Confirm
+   stores the result: the final ranking against the AI's, plus the board's
+   counters (b.stats).
    ═══════════════════════════════════════════════════════════════════ */
 window.Task = (function () {
   const $ = id => document.getElementById(id);
@@ -27,8 +30,10 @@ window.Task = (function () {
       console.error(`[BDR] no interaction module "${s.interaction}" — check Config.INTERACTIONS`);
       return;
     }
+    const task = Tasks.forRound(s.n);
+    Store.setContext({ n: s.n, interaction: s.interaction, taskId: task ? task.id : null });
     board = mod.mount($("task-host"), {
-      task: Tasks.forRound(s.n),
+      task,
       onConfirm: confirm,
       // Paused while the intro card is open or an AI thought is being read.
       paused: () => explainerOpen || !!(board && board.thoughtOpen),
@@ -40,6 +45,7 @@ window.Task = (function () {
 
   function stop() {
     if (board) { board.destroy(); board = null; }
+    Store.setContext(null);
     closeExplainer();
     $("task-host").innerHTML = "";
   }
@@ -63,14 +69,46 @@ window.Task = (function () {
   }
 
   function confirm() {
-    // Not stored yet. When the measures are decided:
-    //   Store.addResult({ interaction: step.interaction, n: step.n, ranking: board.slots.slice(), … });
+    Store.interactionEnd(step);
+    Store.addResult(result());
     Store.sendRemote();
     Flow.next();
   }
 
+  /* The confirmed ranking against the AI's (tile keys, top → bottom):
+       exactMatches  — tiles in the very slot the AI ranks them
+       rankDistance  — Σ |participant slot − AI slot| over all tiles (0 = identical, 18 = reversed)
+     plus who placed what (b.stats) and the interaction's own AI counters (stats.ai). */
+  function result() {
+    const key = id => board.keyOf(id);
+    const ranking = board.slots.slice(), ai = board.aiRanking;
+    const st = board.stats;
+    return {
+      n: step.n, interaction: step.interaction, taskId: board.task.id,
+      thoughtsVisible: !!Config.THOUGHTS.enabled,
+      ranking: ranking.map(key),
+      aiRanking: ai.map(key),
+      exactMatches: ranking.filter((id, i) => id === ai[i]).length,
+      rankDistance: ranking.reduce((sum, id, i) => sum + Math.abs(i - ai.indexOf(id)), 0),
+      pickups: st.pickups,
+      placedByParticipant: st.placedByParticipant,
+      placedByAi: st.placedByAi,
+      participantOnAiSlot: st.participantOnAiSlot,
+      returnsToInbox: st.returnsToInbox,
+      thoughtsRead: st.thoughtsRead,
+      ai: board.aiSummary ? board.aiSummary() : st.ai,
+    };
+  }
+
   function wire() {
-    $("explainer-ok").addEventListener("click", closeExplainer);
+    $("explainer-ok").addEventListener("click", () => {
+      closeExplainer();
+      if (step && board) {                       // the interaction starts now (kept on later reopenings)
+        const task = Tasks.forRound(step.n);
+        Store.interactionStart(step, task ? task.id : null);
+        Store.sendRemote();
+      }
+    });
   }
 
   return { start, stop, wire };

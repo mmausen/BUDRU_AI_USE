@@ -5,6 +5,7 @@
    the tile's authored `heat` row from the task file (% per slot); a tile
    without one falls back to a Gaussian around its target slot. Purely a passive visual suggestion — nothing is
    clickable, every card is placed by hand.
+   Logs "heat_hover" per card hover with how long the heat was on show.
    ═══════════════════════════════════════════════════════════════════ */
 Interactions.register("heatmap", {
   mount(container, ctx) {
@@ -51,6 +52,17 @@ Interactions.register("heatmap", {
     }
 
     let activeId = null;
+    let hoverId = null, hoverAt = 0;
+    function hoverStart(id) { hoverEnd(); hoverId = id; hoverAt = performance.now(); }
+    function hoverEnd() {
+      if (!hoverId) return;
+      const ms = Math.round(performance.now() - hoverAt);
+      const h = b.stats.ai.hoversPerCard, k = b.keyOf(hoverId);
+      h[k] = (h[k] || 0) + 1;
+      b.stats.ai.hovers++;
+      Store.log("heat_hover", { card: k, ms });
+      hoverId = null;
+    }
     function applyHeat(id) {
       const h = computeHeat(id);
       activeId = id;
@@ -86,26 +98,31 @@ Interactions.register("heatmap", {
         '<label class="opt"><input type="checkbox" class="tune-pct" checked> Show %</label>',
       slotDecor(slot) {
         slot.insertAdjacentHTML("afterbegin",
-          '<div class="t-slot-heat"></div><div class="t-slot-pct"></div><div class="t-slot-tag">Most likely</div>');
+          '<div class="t-slot-heat"></div><div class="t-slot-pct"></div><div class="t-slot-tag"></div>');
+        slot.querySelector(".t-slot-tag").textContent = S.t("interactions.heatmap.mostLikely");
       },
       cardDecor(div, card) {
         div.addEventListener("mouseenter", () => {
           if (b.drag) return;
           div.classList.add("suggesting");
           applyHeat(card.id);
+          hoverStart(card.id);
         });
         div.addEventListener("mouseleave", () => {
           if (b.drag && b.drag.id === card.id) return;   // keep it up while this card is dragged
           div.classList.remove("suggesting");
           clearHeat();
+          hoverEnd();
         });
       },
       onDragStart(d) { applyHeat(d.id); },
-      onDragEnd() { clearHeat(); },
+      onDragEnd() { clearHeat(); hoverEnd(); },
       onRender() { if (activeId) applyHeat(activeId); },
       onConfirm: ctx.onConfirm,
     });
 
+    b.stats.ai = { hovers: 0, hoversPerCard: {} };
+    b.onDestroy(hoverEnd);
     b.$(".lg-cold").textContent = S.t("interactions.heatmap.footer");
     b.$(".lg-hot").textContent = S.t("interactions.heatmap.footerHot");
     const op = b.$(".tune-opacity"), pct = b.$(".tune-pct");

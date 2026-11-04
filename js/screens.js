@@ -1,9 +1,14 @@
 /* ═══════════════════════════════════════════════════════════════════
    SCREENS — everything that is not a task: the participant-ID step, the
-   placeholder questionnaires (pre / mid / final) and the thank-you page.
+   questionnaires (pre / mid) and the thank-you page.
 
-   Survey answers are validated but NOT stored yet (no data logging) — the
-   hook is the commented Store.setSurvey call in submitSurvey().
+   Questionnaires live in strings.json (surveys.<id>, per language). A
+   "likert" item is a 1…`scale` rating (default 7) with end labels from its
+   own `anchors` or, without them, ui.survey.likertLow / likertHigh. A mid
+   questionnaire's kicker may name the interaction just used ({badge}).
+
+   Survey answers are stored in the session under the step's storeAs
+   (pre, mid_<n>_<interaction>) and written to the log folder.
    ═══════════════════════════════════════════════════════════════════ */
 window.Screens = (function () {
   const $ = id => document.getElementById(id);
@@ -34,16 +39,32 @@ window.Screens = (function () {
   /* ── surveys ── */
   function surveyScreen(step) {
     survey = step;
-    const def = S.block("surveys." + step.id) || { questions: [] };
     Flow.showScreen("screen-survey");
-    $("survey-kicker").textContent = def.kicker || "";
+    renderSurvey();
+    $("screen-survey").scrollTop = 0;
+  }
+  function renderSurvey(keep) {
+    const def = S.block("surveys." + survey.id) || { questions: [] };
+    const badge = survey.after ? S.t(`interactions.${survey.after}.badge`) : "";
+    $("survey-kicker").textContent = S.fill(def.kicker || "", { badge });
     $("survey-title").textContent = def.title || "";
+    $("survey-intro").textContent = def.intro || "";
+    $("survey-intro").hidden = !def.intro;
     $("survey-note").textContent = "";
     const form = $("survey-form");
     form.innerHTML = "";
     (def.questions || []).forEach(q => form.appendChild(field(q)));
-    $("screen-survey").scrollTop = 0;
+    if (keep) Object.keys(keep).forEach(id => {        // restore answers after a language switch
+      const v = keep[id];
+      if (v === null || v === "") return;
+      const radio = form.querySelector(`input[name="${id}"][value="${v}"]`);
+      if (radio) radio.checked = true;
+      const ta = form.querySelector(`textarea[name="${id}"]`);
+      if (ta) ta.value = v;
+    });
   }
+  // Language switched while a questionnaire is open: relabel it, keep the answers.
+  function relabel() { if (survey) renderSurvey(collect().out); }
 
   function field(q) {
     const wrap = document.createElement("div");
@@ -54,21 +75,25 @@ window.Screens = (function () {
     wrap.appendChild(lbl);
 
     if (q.type === "likert") {
+      const scale = document.createElement("div");
+      scale.className = "likert-scale";
       const row = document.createElement("div");
       row.className = "likert";
-      for (let n = 1; n <= 5; n++) {
+      for (let n = 1; n <= (q.scale || 7); n++) {
         const opt = document.createElement("label");
         opt.className = "likert-opt";
         opt.innerHTML = `<input type="radio" name="${q.id}" value="${n}"/><span>${n}</span>`;
         row.appendChild(opt);
       }
-      wrap.appendChild(row);
+      scale.appendChild(row);
       const anc = document.createElement("div");
       anc.className = "likert-anchors";
       anc.innerHTML = "<span></span><span></span>";
-      anc.children[0].textContent = S.t("ui.survey.likertLow");
-      anc.children[1].textContent = S.t("ui.survey.likertHigh");
-      wrap.appendChild(anc);
+      const [lo, hi] = q.anchors || [S.t("ui.survey.likertLow"), S.t("ui.survey.likertHigh")];
+      anc.children[0].textContent = lo;
+      anc.children[1].textContent = hi;
+      scale.appendChild(anc);
+      wrap.appendChild(scale);
     } else {
       const ta = document.createElement("textarea");
       ta.name = q.id;
@@ -101,8 +126,7 @@ window.Screens = (function () {
   function submitSurvey() {
     const { ok } = collect();
     if (!ok) { $("survey-note").textContent = S.t("ui.survey.required"); return; }
-    // Not stored yet. When the questionnaires are final:
-    //   Store.setSurvey(survey.storeAs || survey.id, collect().out);
+    Store.setSurvey(survey.storeAs || survey.id, collect().out);
     Store.sendRemote();
     Flow.next();
   }
@@ -123,5 +147,5 @@ window.Screens = (function () {
     $("btn-survey-next").addEventListener("click", submitSurvey);
   }
 
-  return { wire, anonId, survey: surveyScreen, end };
+  return { wire, anonId, survey: surveyScreen, relabel, end };
 })();
