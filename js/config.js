@@ -51,7 +51,7 @@ window.Config = (function () {
                stored in the session as `interactions` (and the log's
                interactionOrderRandom flag); results, interaction times and
                mid-questionnaires (mid_<n>_<key>) all carry the interaction key. */
-  const RANDOM_INTERACTION_ORDER = true;
+  const RANDOM_INTERACTION_ORDER = false;
 
   /* ═══ the tasks ═══════════════════════════════════════════════════
      Which task set every interaction draws its task from (tasks/<set>.json):

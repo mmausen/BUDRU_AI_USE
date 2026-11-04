@@ -6,8 +6,8 @@ runs the same sorting task under several different ways of working with an AI
 (five active; `radial` is disabled).
 
 There are no AI characters (bold / cautious) and no counterbalanced groups (G1, G2 …):
-everyone gets the same interactions, but each participant gets them in a fresh random
-order (`Config.RANDOM_INTERACTION_ORDER`).
+everyone gets the same interactions in the same order. Only the task behind each
+interaction is drawn at random per participant (`Config.RANDOM_TASK_ASSIGNMENT`).
 
 ## Flow
 
@@ -21,9 +21,9 @@ Participant ID → pre-questionnaire
   → thank-you page
 ```
 
-AI 1–5 are HINT, MAGNET, HEATMAP, HANDOFF and OVERRIDE, shuffled per participant.
-The order is stored in the session as `interactions`; with
-`RANDOM_INTERACTION_ORDER = false` it is the order of `Config.INTERACTIONS`.
+AI 1–5 are HINT, MAGNET, HEATMAP, HANDOFF and OVERRIDE, in that fixed order
+(`Config.INTERACTIONS`). `RANDOM_INTERACTION_ORDER = true` would shuffle them per
+participant instead; it is off. The order is stored in the session as `interactions`.
 RADIAL is commented out of `Config.INTERACTIONS`. Its module stays in the code,
 so uncommenting the line brings it back.
 
@@ -138,7 +138,7 @@ npm start       # → http://localhost:8080
 ## Configuring (`js/config.js`)
 
 - `INTERACTIONS` — an array of the interactions that run. Remove or comment out an entry to drop that interaction (radial is commented out).
-- `RANDOM_INTERACTION_ORDER` — `true`: a fresh random order per participant; `false`: the array's order.
+- `RANDOM_INTERACTION_ORDER` — `false` (current): the array's order; `true`: a fresh random order per participant.
 - `LANG` — `default` language (`"en"` / `"de"`) and whether the EN / DE `switcher` is shown.
 - `RANDOM_TASK_ASSIGNMENT` — random task per interaction, per session (see Task sets).
 - `THOUGHTS` — `enabled` shows the AI's reasoning on each card; `openDelayMs` is the hover delay.
