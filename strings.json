@@ -17,7 +17,7 @@
       },
       "survey": {
         "continue": "Continue",
-        "required": "Please answer all required questions.",
+        "required": "Please answer all questions.",
         "likertLow": "Strongly disagree",
         "likertHigh": "Strongly agree"
       },
@@ -257,7 +257,7 @@
       },
       "survey": {
         "continue": "Weiter",
-        "required": "Bitte beantworten Sie alle Pflichtfragen.",
+        "required": "Bitte beantworten Sie alle Fragen.",
         "likertLow": "Stimme überhaupt nicht zu",
         "likertHigh": "Stimme voll und ganz zu"
       },

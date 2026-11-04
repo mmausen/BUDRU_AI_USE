@@ -71,7 +71,7 @@ window.Screens = (function () {
     wrap.className = "q";
     const lbl = document.createElement("div");
     lbl.className = "q-label";
-    lbl.textContent = q.label + (q.required ? " *" : "");
+    lbl.textContent = q.label;   // no "*": every rating is required, Continue says so if one is missing
     wrap.appendChild(lbl);
 
     if (q.type === "likert") {

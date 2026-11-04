@@ -35,7 +35,7 @@ A `likert` item takes `scale` (default 7) and optional `anchors: [low, high]`; w
 
 Everything the participant sees comes in English and German: interface, intro cards, questionnaires and task content. An **EN / DE switch** sits top right on every screen, outside devMode.
 
-- `Config.LANG.default` is the starting language; `Config.LANG.switcher: false` hides the switch.
+- `Config.LANG.default` is the starting language (`"de"`); `Config.LANG.switcher: false` hides the switch.
 - The participant's choice is remembered in their browser.
 - Switching on a questionnaire relabels it and keeps the answers. Switching during a task rebuilds the task in the new language, so cards placed so far are reset.
 - The session records `lang` and every switch in `langChanges` (language, step, time).
@@ -146,7 +146,9 @@ npm start       # → http://localhost:8080
 
 ## Logging
 
-With `Config.CONFIG.fileLogging: true` (default), the machine running `npm start` saves one folder per participant. Set it to `false` and nothing is sent; the session then only autosaves to the browser's localStorage.
+With `Config.CONFIG.fileLogging: true`, the machine running `npm start` saves one folder per participant. Set it to `false` and nothing is sent; the session then only autosaves to the browser's localStorage.
+
+**Per branch.** `dev` keeps `fileLogging: true` (run it with `npm start` on the study machine). `pages` keeps it `false`: GitHub Pages has no server to write files. The flag is the only difference between the two.
 
 **Where.** In the project: `logs/`. The whole folder is git-ignored (`/logs/` in `.gitignore`), so it is never committed or pushed, and checkout, pull or reset leave it alone. Only `git clean -x` would delete it. The server never serves it over HTTP. If `logs/` or a participant's folder is deleted, it is created again: at start-up and before every write, with the full session (each write carries everything). Change the location with `LOG_DIR=/some/path npm start`. The server prints the path on start, and `GET /collect-logs/health` returns it.
 

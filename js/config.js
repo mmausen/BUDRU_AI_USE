@@ -11,7 +11,7 @@ window.Config = (function () {
     devMode: true,                 // bottom-right dev bar: "Skip ▸", a jump-to-step picker
                                    //   and the interaction tuning controls in each task footer.
                                    //   Prototyping aid only — MUST be false for real participants.
-    fileLogging: false,            // SAVE LOG FILES on the machine running server.js (npm start).
+    fileLogging: true,             // SAVE LOG FILES on the machine running server.js (npm start).
                                    //   true → each participant gets a folder
                                    //   <YYYY-MM-DD_HH-MM-SS>_<ID>/session.json in the log directory
                                    //   in the project's logs/ folder (git-ignored) once their ID is entered.
@@ -61,7 +61,7 @@ window.Config = (function () {
        switcher — show the EN / DE switch (top right, on every screen).
                   A participant's choice is remembered in their browser. */
   const LANG = {
-    default: "en",
+    default: "de",
     switcher: true,
   };
 
