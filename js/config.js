@@ -28,21 +28,30 @@ window.Config = (function () {
   const STEPS = {
     anonId:      true,   // ask for the participant ID the research team issued
     preSurvey:   true,   // baseline questionnaire (7 ratings) before the first interaction
-    midSurvey:   true,   // questionnaire (9 ratings) after EVERY interaction
+    midSurvey:   true,   // questionnaire (6 ratings) after EVERY interaction
   };
 
   /* ═══ the AI interactions ═════════════════════════════════════════
-     An ARRAY: its order IS the running order. Remove an entry (or comment
-     it out) to drop that interaction from the run. Keys must match a module
-     registered in js/interactions/*.js. */
+     An ARRAY of the interactions that run. Remove an entry (or comment it
+     out) to drop that interaction from the run. Keys must match a module
+     registered in js/interactions/*.js. Its order is the running order
+     unless RANDOM_INTERACTION_ORDER shuffles it. */
   const INTERACTIONS = [
     "hint",       // 1 — picked-up card: the AI highlights its suggested slot
     "magnet",     // 2 — the dragged card is magnetically pulled to the AI's slot
-    "radial",     // 3 — hover a card: two slot options (one is a decoy)
+    // "radial",  // 3 — hover a card: two slot options (one is a decoy) — DISABLED
     "heatmap",    // 4 — hover a card: hot→cold probability over every slot
-    "handoff",    // 5 — stop moving and the AI takes the cursor and finishes
+    "handoff",    // 5 — cursor in the take-over zone: the AI takes the cursor and sorts
     "override",   // 6 — sort everything yourself, then the AI overrides you
   ];
+
+  /* The order the interactions run in.
+       false — the order of INTERACTIONS above (same for everyone)
+       true  — a fresh random order per participant (session). The order is
+               stored in the session as `interactions` (and the log's
+               interactionOrderRandom flag); results, interaction times and
+               mid-questionnaires (mid_<n>_<key>) all carry the interaction key. */
+  const RANDOM_INTERACTION_ORDER = true;
 
   /* ═══ the tasks ═══════════════════════════════════════════════════
      Which task set every interaction draws its task from (tasks/<set>.json):
@@ -52,7 +61,7 @@ window.Config = (function () {
                        room for interpretation (6 tasks)
      The AI recommends each task's `target-order`; the heatmap shows each
      tile's `heat` row. In devMode the dev bar's picker overrides the set. */
-  const TASK_SET = "placeholder";
+  const TASK_SET = "prio";
 
   /* ═══ language ════════════════════════════════════════════════════
      One language for everything: interface text, questionnaires and task
@@ -79,7 +88,7 @@ window.Config = (function () {
      bubble with the thought. Same in all six interactions. Reading a thought
      pauses the handoff AI, so it never takes over while someone reads. */
   const THOUGHTS = {
-    enabled: true,
+    enabled: false,                // hidden for now: no chips, no intro sentence
     openDelayMs: 150,              // hover this long on the chip before the bubble opens
   };
 
@@ -94,6 +103,6 @@ window.Config = (function () {
   // Where Store.sendRemote() posts the session. "" → localStorage only.
   const ENDPOINT_URL = "/collect-logs";
 
-  return { CONFIG, STEPS, INTERACTIONS, TASK_SET, LANG, RANDOM_TASK_ASSIGNMENT, THOUGHTS,
+  return { CONFIG, STEPS, INTERACTIONS, RANDOM_INTERACTION_ORDER, TASK_SET, LANG, RANDOM_TASK_ASSIGNMENT, THOUGHTS,
            OVERRIDE, ENDPOINT_URL };
 })();

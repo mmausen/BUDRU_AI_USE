@@ -1,0 +1,921 @@
+{
+  "meta": {
+    "type": "prio",
+    "name": {
+      "de": "Priorisierung",
+      "en": "Prioritisation"
+    },
+    "languages": [
+      "de",
+      "en"
+    ],
+    "tileCount": 6,
+    "labels": {
+      "de": {
+        "brief": "Ordnen Sie die sechs Fälle nach Dringlichkeit – den dringendsten nach oben.",
+        "inbox": "Eingang – neue Fälle",
+        "ladder": "Rangfolge – Fälle hierher ziehen",
+        "first": "Am dringendsten",
+        "last": "Am wenigsten dringend"
+      },
+      "en": {
+        "brief": "Rank the six cases by urgency — most urgent at the top.",
+        "inbox": "Inbox — incoming cases",
+        "ladder": "Ranking — drag cases here",
+        "first": "Most urgent",
+        "last": "Least urgent"
+      }
+    },
+    "notes": "Bilingual. STRUCTURE IS SHARED, PROSE IS PER LANGUAGE: id, tiles[].key, target-order and tiles[].heat exist once and cannot diverge between languages. target-order = tile keys top to bottom: the order the AI recommends. tiles[].heat = the probability (%) of that tile belonging in slot 1..6, used by the heatmap interaction; each row sums to 100 and each slot column to ~100. tiles[].<lang>.thought = the AI's first-person reasoning for the tile's placement (not displayed yet). The prototype shuffles the tiles."
+  },
+  "tasks": [
+    {
+      "id": "P1",
+      "source": "designing-trust-pt tasks.json T1",
+      "de": {
+        "title": "Verkehr",
+        "description": "Sechs Vorgänge sind im Verkehrsreferat eingegangen. Ordnen Sie sie nach Priorität."
+      },
+      "en": {
+        "title": "Transportation",
+        "description": "Six cases have come into the transport desk. Rank them by priority."
+      },
+      "target-order": [
+        4,
+        0,
+        5,
+        1,
+        3,
+        2
+      ],
+      "tiles": [
+        {
+          "key": 0,
+          "heat": [
+            37,
+            38,
+            21,
+            4,
+            0,
+            0
+          ],
+          "de": {
+            "text": "Falsche Umleitung in Straßensperrungsmitteilung",
+            "description": "Die Bekanntmachung geht innerhalb der nächsten Stunde in den Druck, die Umleitung ist unklar formuliert. Autofahrer fahren möglicherweise einen Umweg.",
+            "thought": "In einer Stunde ist der Druck raus; eine Zeile zu korrigieren kostet mich jetzt nur Minuten."
+          },
+          "en": {
+            "text": "Incorrect diversion route in road closure notice",
+            "description": "The notice goes to print within the hour with an unclear diversion line. Drivers may take a longer way round.",
+            "thought": "It goes to print within the hour; fixing one line costs me minutes now."
+          }
+        },
+        {
+          "key": 1,
+          "heat": [
+            1,
+            6,
+            28,
+            39,
+            20,
+            6
+          ],
+          "de": {
+            "text": "Genehmigung für Umzugscontainer benötigt",
+            "description": "Antragsschluss ist heute bei Dienstschluss. Wird er verpasst, bucht der Anwohner den Container für nächste Woche neu.",
+            "thought": "Heute fällig, aber verpasst bedeutet nur eine Woche Aufschub für den Umzug."
+          },
+          "en": {
+            "text": "Skip permit needed for house move",
+            "description": "Applications close when the office does today. Missed, the resident rebooks the skip for next week.",
+            "thought": "Due today, but missing it only pushes the move back a week."
+          }
+        },
+        {
+          "key": 2,
+          "heat": [
+            0,
+            0,
+            1,
+            8,
+            29,
+            62
+          ],
+          "de": {
+            "text": "Fehlendes Bushaltestellenschild",
+            "description": "Bestellung fällig innerhalb von zwei Wochen. Später fällt der Ersatz in die Charge des nächsten Quartals.",
+            "thought": "Ein fehlendes Schild ist ärgerlich, schlimmstenfalls kommt der Ersatz ein Quartal später."
+          },
+          "en": {
+            "text": "Missing bus stop sign",
+            "description": "Order due within a fortnight. Later, the replacement falls into the next quarter's batch.",
+            "thought": "A missing sign is annoying; at worst the replacement comes a quarter later."
+          }
+        },
+        {
+          "key": 3,
+          "heat": [
+            0,
+            1,
+            7,
+            26,
+            37,
+            29
+          ],
+          "de": {
+            "text": "Frist für Rückmeldungen zu Parkregelungen läuft bald ab",
+            "description": "Läuft seit dem Frühjahr, die Frist endet in zwei Wochen. Danach geht der Entwurf unverändert weiter.",
+            "thought": "Die Rückmeldefrist läuft noch zwei Wochen – wichtig, aber nicht heute."
+          },
+          "en": {
+            "text": "Parking restrictions consultation closing soon",
+            "description": "Open since spring; responses close within a fortnight. After that the draft zone goes forward as written.",
+            "thought": "The consultation still has two weeks to run — important, but not today."
+          }
+        },
+        {
+          "key": 4,
+          "heat": [
+            57,
+            34,
+            8,
+            1,
+            0,
+            0
+          ],
+          "de": {
+            "text": "Rollstuhlfahrer erreicht Gehweg nicht",
+            "description": "Kein Termin festgelegt. Der Anwohner gibt an, mit seinem Rollstuhl derzeit nicht auf den Gehweg zu kommen.",
+            "thought": "Jemand kommt gerade nicht sicher aus dem Haus – das wiegt schwerer als jede Frist."
+          },
+          "en": {
+            "text": "Wheelchair user unable to access pavement",
+            "description": "No date set. The resident says they cannot currently get their wheelchair onto the pavement.",
+            "thought": "Someone can't get out of their home safely right now — that outweighs any deadline."
+          }
+        },
+        {
+          "key": 5,
+          "heat": [
+            5,
+            21,
+            36,
+            22,
+            13,
+            3
+          ],
+          "de": {
+            "text": "Meldungen über unebenen Gehweg in einer Straße",
+            "description": "Keine Prüfung geplant oder vorgeschrieben. Drei Anwohner haben unabhängig voneinander unebene Platten vor der Praxis erwähnt.",
+            "thought": "Unebene Platten vor einer Arztpraxis sind ein Sturzrisiko, und drei Meldungen sind ein Muster."
+          },
+          "en": {
+            "text": "Reports of uneven paving on one street",
+            "description": "No inspection scheduled or required. Three residents have separately mentioned uneven paving outside the surgery.",
+            "thought": "Uneven paving outside a surgery is a fall risk, and three reports make a pattern."
+          }
+        }
+      ]
+    },
+    {
+      "id": "P2",
+      "source": "designing-trust-pt tasks.json T2",
+      "de": {
+        "title": "Wohnen",
+        "description": "Sechs Vorgänge sind im Wohnungsamt eingegangen. Ordnen Sie sie nach Priorität."
+      },
+      "en": {
+        "title": "Housing",
+        "description": "Six cases have come into the housing office. Rank them by priority."
+      },
+      "target-order": [
+        4,
+        5,
+        0,
+        1,
+        3,
+        2
+      ],
+      "tiles": [
+        {
+          "key": 0,
+          "heat": [
+            19,
+            24,
+            34,
+            18,
+            4,
+            1
+          ],
+          "de": {
+            "text": "Wohnungsbesichtigung scheitert an fehlendem Zugangscode",
+            "description": "Die Besichtigung beginnt innerhalb der nächsten Stunde, der Code des Schlüsseltresors wurde nicht übermittelt. Der Interessent wartet draußen.",
+            "thought": "Der Interessent steht schon draußen; den Code zu schicken dauert eine Minute."
+          },
+          "en": {
+            "text": "Property viewing blocked by missing access code",
+            "description": "A viewing starts within the hour and the key safe code has not been shared. The applicant waits outside.",
+            "thought": "The applicant is already waiting outside; sending the code takes a minute."
+          }
+        },
+        {
+          "key": 1,
+          "heat": [
+            1,
+            6,
+            26,
+            37,
+            23,
+            7
+          ],
+          "de": {
+            "text": "Kautionsregistrierung heute fällig",
+            "description": "Heute bis Dienstschluss einzureichen, sonst werden die Mietunterlagen neu ausgestellt.",
+            "thought": "Heute fällig, sonst nur neuer Papierkram – lästig, aber reparabel."
+          },
+          "en": {
+            "text": "Tenant deposit registration due today",
+            "description": "Lodged before close today, or the tenancy paperwork is reissued.",
+            "thought": "Due today, otherwise just new paperwork — tedious, but fixable."
+          }
+        },
+        {
+          "key": 2,
+          "heat": [
+            0,
+            0,
+            1,
+            7,
+            30,
+            62
+          ],
+          "de": {
+            "text": "Vertrag für Mülllagerung muss erneuert werden",
+            "description": "Liegt seit März, Verlängerung fällig in zwei Wochen. Verspätet wird der Regelsatz statt des vereinbarten Satzes berechnet.",
+            "thought": "Hier geht es nur um einen Tarif für die Mülllagerung."
+          },
+          "en": {
+            "text": "Bin store agreement needs renewal",
+            "description": "Pending since March; renewal due within a fortnight. Late, the block is billed at the standard rate.",
+            "thought": "This is only about the rate for the bin store."
+          }
+        },
+        {
+          "key": 3,
+          "heat": [
+            0,
+            1,
+            6,
+            23,
+            40,
+            30
+          ],
+          "de": {
+            "text": "Wohnungsanpassung wartet auf Angebot",
+            "description": "Angebote fällig in zwei Wochen, sonst geht der Vorgang ans Ende der Prüfliste.",
+            "thought": "Die Anpassung ist für jemanden wichtig, aber die Frist läuft noch zwei Wochen."
+          },
+          "en": {
+            "text": "Home adaptation awaiting contractor quote",
+            "description": "Quotes due within a fortnight, or the file returns to the back of the assessment list.",
+            "thought": "The adaptation matters to someone, but there are two weeks left."
+          }
+        },
+        {
+          "key": 4,
+          "heat": [
+            57,
+            34,
+            8,
+            1,
+            0,
+            0
+          ],
+          "de": {
+            "text": "Bewohner wartet auf Nachfolgeregelung",
+            "description": "Kein Termin festgelegt. Wird der Anspruch nicht vor Mietende entschieden, kann er nicht wieder aufgenommen werden.",
+            "thought": "Verpasst man diese Entscheidung, verliert jemand sein Zuhause – endgültig."
+          },
+          "en": {
+            "text": "Resident awaiting succession decision",
+            "description": "No date set. If the claim is not decided before the tenancy ends it cannot be reopened.",
+            "thought": "If this decision is missed, someone loses their home — for good."
+          }
+        },
+        {
+          "key": 5,
+          "heat": [
+            22,
+            36,
+            25,
+            14,
+            3,
+            0
+          ],
+          "de": {
+            "text": "Mehrere Haushalte melden Feuchtigkeit",
+            "description": "Keine Prüfung geplant oder vorgeschrieben. Vier Haushalte eines Treppenhauses melden seit dem Frühjahr dasselbe.",
+            "thought": "Vier Haushalte mit Feuchtigkeit seit dem Frühjahr – das ist ein Gesundheitsthema."
+          },
+          "en": {
+            "text": "Damp reported by multiple households",
+            "description": "No inspection scheduled or required. Four households on one stairwell have reported the same thing since spring.",
+            "thought": "Four households with damp since spring — that is a health issue."
+          }
+        }
+      ]
+    },
+    {
+      "id": "P3",
+      "source": "designing-trust-pt tasks.json T5",
+      "de": {
+        "title": "Öffentliche Sicherheit",
+        "description": "Sechs Vorgänge sind bei der Ordnungsbehörde eingegangen. Ordnen Sie sie nach Priorität."
+      },
+      "en": {
+        "title": "Public Safety",
+        "description": "Six cases have come into the public safety team. Rank them by priority."
+      },
+      "target-order": [
+        4,
+        5,
+        2,
+        0,
+        1,
+        3
+      ],
+      "tiles": [
+        {
+          "key": 0,
+          "heat": [
+            4,
+            15,
+            24,
+            34,
+            18,
+            5
+          ],
+          "de": {
+            "text": "Veranstaltungspersonal ohne Unterlagen",
+            "description": "Die Ordner kommen innerhalb der nächsten Stunde, die Unterlagen sind nicht gedruckt. Sie werden am Handy eingewiesen.",
+            "thought": "Die Einweisung klappt notfalls auch am Handy – aber es ist in einer Stunde."
+          },
+          "en": {
+            "text": "Event staff missing briefing materials",
+            "description": "Marshals arrive within the hour and the pack is unprinted. They brief from a phone screen instead.",
+            "thought": "The briefing works from a phone if it must — but it is within the hour."
+          }
+        },
+        {
+          "key": 1,
+          "heat": [
+            0,
+            1,
+            6,
+            26,
+            38,
+            29
+          ],
+          "de": {
+            "text": "Änderung einer Gewerbeerlaubnis heute fällig",
+            "description": "Heute bis Dienstschluss einzureichen, sonst gilt die Änderung erst ab dem Folgemonat.",
+            "thought": "Heute fällig, verspätet gilt die Änderung nur einen Monat später."
+          },
+          "en": {
+            "text": "Business licence change due today",
+            "description": "Lodged before close today, or the variation applies only from the following month.",
+            "thought": "Due today; late, the change simply applies a month later."
+          }
+        },
+        {
+          "key": 2,
+          "heat": [
+            5,
+            18,
+            35,
+            24,
+            14,
+            4
+          ],
+          "de": {
+            "text": "Videoaufnahmen könnten verloren gehen",
+            "description": "In zwei Wochen anzufordern, sonst wird das Material im üblichen Turnus überschrieben.",
+            "thought": "Ist das Material überschrieben, ist das Beweismittel für immer weg."
+          },
+          "en": {
+            "text": "CCTV footage at risk of being lost",
+            "description": "Requested within a fortnight, or the footage is overwritten on the normal cycle.",
+            "thought": "Once the footage is overwritten, the evidence is gone for good."
+          }
+        },
+        {
+          "key": 3,
+          "heat": [
+            0,
+            0,
+            1,
+            8,
+            29,
+            62
+          ],
+          "de": {
+            "text": "Frist für Sicherheitsförderung nähert sich",
+            "description": "Die Gruppe hat im März erstmals gefragt. Einreichung in zwei Wochen, sonst wartet sie auf die nächste Runde.",
+            "thought": "Die Gruppe wartet schlimmstenfalls auf die nächste Förderrunde."
+          },
+          "en": {
+            "text": "Community safety grant deadline approaching",
+            "description": "The group first asked in March. Submitted within a fortnight, or they wait for next year's round.",
+            "thought": "At worst the group waits for the next funding round."
+          }
+        },
+        {
+          "key": 4,
+          "heat": [
+            62,
+            29,
+            8,
+            1,
+            0,
+            0
+          ],
+          "de": {
+            "text": "Schülerlotsenstelle unbesetzt",
+            "description": "Kein Termin festgelegt. Die Stelle vor der Grundschule ist seit Schuljahresbeginn unbesetzt.",
+            "thought": "Jeden Morgen überqueren Grundschulkinder dort die Straße – ohne Lotsen."
+          },
+          "en": {
+            "text": "School crossing patrol position vacant",
+            "description": "No date set. The post outside the primary school has been unfilled since term began.",
+            "thought": "Primary school children cross there every morning — with no patrol."
+          }
+        },
+        {
+          "key": 5,
+          "heat": [
+            29,
+            37,
+            27,
+            6,
+            1,
+            0
+          ],
+          "de": {
+            "text": "Meldungen über beschädigtes Kanalgeländer",
+            "description": "Keine Prüfung geplant oder vorgeschrieben. Spaziergänger haben dreimal eine Lücke im Geländer erwähnt.",
+            "thought": "Eine Lücke im Geländer am Kanal kann jemanden ins Wasser fallen lassen."
+          },
+          "en": {
+            "text": "Reports of damaged canal railing",
+            "description": "No inspection scheduled or required. Walkers have mentioned a gap in the railing on three occasions.",
+            "thought": "A gap in a canal railing can let someone fall into the water."
+          }
+        }
+      ]
+    },
+    {
+      "id": "P4",
+      "source": "designing-trust-pt tasks.json T7",
+      "de": {
+        "title": "Soziale Hilfen",
+        "description": "Sechs Vorgänge sind bei den sozialen Hilfen eingegangen. Ordnen Sie sie nach Priorität."
+      },
+      "en": {
+        "title": "Social Support",
+        "description": "Six cases have come into social support. Rank them by priority."
+      },
+      "target-order": [
+        1,
+        4,
+        0,
+        5,
+        2,
+        3
+      ],
+      "tiles": [
+        {
+          "key": 0,
+          "heat": [
+            14,
+            19,
+            35,
+            25,
+            6,
+            1
+          ],
+          "de": {
+            "text": "Termin ohne Dolmetscherunterstützung",
+            "description": "Der Termin beginnt innerhalb der nächsten Stunde ohne gebuchten Dolmetscher. Er muss verlegt werden.",
+            "thought": "Ohne Dolmetscher platzt der Termin in einer Stunde – jetzt noch zu retten."
+          },
+          "en": {
+            "text": "Appointment missing interpreter support",
+            "description": "The appointment begins within the hour with no interpreter booked. It will need rescheduling.",
+            "thought": "Without an interpreter the appointment fails within the hour — still saveable now."
+          }
+        },
+        {
+          "key": 1,
+          "heat": [
+            58,
+            31,
+            9,
+            1,
+            0,
+            1
+          ],
+          "de": {
+            "text": "Antrag auf Soforthilfe heute fällig",
+            "description": "Heute bis Dienstschluss einzureichen, sonst fällt die Zahlung in den Lauf des nächsten Monats.",
+            "thought": "Soforthilfe heißt: Jemand braucht das Geld jetzt, nicht im nächsten Monat."
+          },
+          "en": {
+            "text": "Emergency support application due today",
+            "description": "Lodged before close today, or the payment falls into next month's run.",
+            "thought": "Emergency support means someone needs the money now, not next month."
+          }
+        },
+        {
+          "key": 2,
+          "heat": [
+            0,
+            1,
+            5,
+            24,
+            40,
+            30
+          ],
+          "de": {
+            "text": "Unterlagen zur Pflegeprüfung überfällig",
+            "description": "In zwei Wochen zurückzusenden, sonst ruhen die Zahlungen bis zur Wiederaufnahme des Vorgangs.",
+            "thought": "Zahlungen könnten ruhen, aber es bleiben noch zwei Wochen."
+          },
+          "en": {
+            "text": "Caregiver review paperwork overdue",
+            "description": "Returned within a fortnight, or payments pause until the file is reopened.",
+            "thought": "Payments could pause, but there are still two weeks."
+          }
+        },
+        {
+          "key": 3,
+          "heat": [
+            0,
+            0,
+            1,
+            7,
+            30,
+            62
+          ],
+          "de": {
+            "text": "Beförderungsregelung wartet auf Genehmigung",
+            "description": "Seit dem Frühjahr in Abstimmung. In zwei Wochen zu unterzeichnen, sonst gilt wieder die teurere Regelung.",
+            "thought": "Hier geht es um Kosten, nicht um eine Notlage."
+          },
+          "en": {
+            "text": "Transport arrangements awaiting approval",
+            "description": "Under discussion since spring. Signed within a fortnight, or the route reverts to the costlier arrangement.",
+            "thought": "This is about cost, not about anyone in need."
+          }
+        },
+        {
+          "key": 4,
+          "heat": [
+            25,
+            37,
+            29,
+            8,
+            1,
+            0
+          ],
+          "de": {
+            "text": "Anspruch auf Nachzahlung gefährdet",
+            "description": "Kein Termin festgelegt. Ist die Frist verstrichen, kann der zurückliegende Zeitraum nicht mehr beansprucht werden.",
+            "thought": "Läuft die Frist ab, ist der Anspruch unwiderruflich verloren."
+          },
+          "en": {
+            "text": "Benefit backdating eligibility at risk",
+            "description": "No date set, but once the window passes the earlier period cannot be claimed.",
+            "thought": "Once the window passes, the claim is lost for good."
+          }
+        },
+        {
+          "key": 5,
+          "heat": [
+            3,
+            12,
+            21,
+            36,
+            22,
+            6
+          ],
+          "de": {
+            "text": "Fälle ohne zuständige Sachbearbeitung",
+            "description": "Kein Termin festgelegt und keine Neuverteilung vorgesehen. Rund elf Vorgänge scheinen seit Juni ohne zuständige Person zu sein.",
+            "thought": "Elf Fälle ohne Ansprechperson – da kann unbemerkt viel schiefgehen."
+          },
+          "en": {
+            "text": "Cases without assigned caseworker",
+            "description": "No date set and no reallocation planned. Around eleven files appear to have had no named worker since June.",
+            "thought": "Eleven cases with nobody responsible — a lot can go wrong unnoticed."
+          }
+        }
+      ]
+    },
+    {
+      "id": "P5",
+      "source": "designing-trust-pt tasks.json T9",
+      "de": {
+        "title": "Bauwesen",
+        "description": "Sechs Vorgänge sind im Bauamt eingegangen. Ordnen Sie sie nach Priorität."
+      },
+      "en": {
+        "title": "Building & Construction",
+        "description": "Six cases have come into the building control office. Rank them by priority."
+      },
+      "target-order": [
+        5,
+        4,
+        1,
+        0,
+        2,
+        3
+      ],
+      "tiles": [
+        {
+          "key": 0,
+          "heat": [
+            5,
+            15,
+            23,
+            31,
+            20,
+            6
+          ],
+          "de": {
+            "text": "Falsche Kontaktdaten auf Baustellenschild",
+            "description": "Der Bauzaun wird innerhalb der nächsten Stunde gestellt, mit falschem Ansprechpartner. Nachbarn rufen die falsche Stelle an.",
+            "thought": "Falsche Nummer am Bauzaun ist ärgerlich, aber schnell korrigiert."
+          },
+          "en": {
+            "text": "Incorrect contact details on site notice",
+            "description": "The hoarding goes up within the hour with the wrong contact name. Neighbours call the wrong desk.",
+            "thought": "A wrong number on the hoarding is annoying, but quickly corrected."
+          }
+        },
+        {
+          "key": 1,
+          "heat": [
+            8,
+            24,
+            39,
+            23,
+            5,
+            1
+          ],
+          "de": {
+            "text": "Beginn der Gerüstgenehmigung unbestätigt",
+            "description": "Heute bis Dienstschluss zu bestätigen, sonst stellt die Firma einen Stillstandstag in Rechnung.",
+            "thought": "Heute fällig, sonst kostet es einen Stillstandstag."
+          },
+          "en": {
+            "text": "Scaffold permit start date unconfirmed",
+            "description": "Confirmed before close today, or the contractor bills for an idle day.",
+            "thought": "Due today, otherwise it costs an idle day."
+          }
+        },
+        {
+          "key": 2,
+          "heat": [
+            0,
+            1,
+            5,
+            23,
+            40,
+            31
+          ],
+          "de": {
+            "text": "Baumaßnahme noch nicht erfasst",
+            "description": "In zwei Wochen zu erfassen, sonst beginnt die Frist der Nachbarn von vorn.",
+            "thought": "Erfassen in zwei Wochen reicht; sonst beginnt nur eine Frist neu."
+          },
+          "en": {
+            "text": "Building work notification not recorded",
+            "description": "Logged within a fortnight, or the neighbours' response period starts again.",
+            "thought": "Logging it within two weeks is enough; otherwise a period just restarts."
+          }
+        },
+        {
+          "key": 3,
+          "heat": [
+            0,
+            0,
+            1,
+            7,
+            30,
+            62
+          ],
+          "de": {
+            "text": "Frist für Denkmalschutz-Rückmeldungen läuft bald ab",
+            "description": "Seit letztem Monat ausgehängt. Stellungnahmen fällig in zwei Wochen, sonst entscheidet allein der Amtsbericht.",
+            "thought": "Die Rückmeldefrist läuft noch, und ein Amtsbericht liegt ohnehin vor."
+          },
+          "en": {
+            "text": "Conservation area consultation closing soon",
+            "description": "Advertised last month. Responses due within a fortnight, or it proceeds on the officer's report alone.",
+            "thought": "Responses are still open, and there is an officer's report anyway."
+          }
+        },
+        {
+          "key": 4,
+          "heat": [
+            33,
+            38,
+            23,
+            5,
+            1,
+            0
+          ],
+          "de": {
+            "text": "Fall unerlaubter Bauarbeiten gefährdet",
+            "description": "Kein Termin festgelegt. Nach Ablauf der Vierjahresfrist sind die Arbeiten nicht mehr angreifbar.",
+            "thought": "Nach vier Jahren ist der Fall nicht mehr angreifbar – das lässt sich nicht nachholen."
+          },
+          "en": {
+            "text": "Unauthorised building work case at risk",
+            "description": "No date set, but once the four-year period passes the works can no longer be challenged.",
+            "thought": "After four years the case can no longer be pursued — no way to catch up later."
+          }
+        },
+        {
+          "key": 5,
+          "heat": [
+            53,
+            22,
+            8,
+            13,
+            4,
+            0
+          ],
+          "de": {
+            "text": "Sorgen wegen Bewegung einer Stützmauer",
+            "description": "Keine Begutachtung geplant oder vorgeschrieben. Zwei Kleingärtner sagen, die Mauer sehe anders aus als im Vorjahr.",
+            "thought": "Eine Stützmauer, die sich bewegt, kann einstürzen – das prüfe ich zuerst."
+          },
+          "en": {
+            "text": "Concerns about retaining wall movement",
+            "description": "No survey scheduled or required. Two allotment holders have said the wall looks different from last year.",
+            "thought": "A retaining wall that is moving can collapse — I check that first."
+          }
+        }
+      ]
+    },
+    {
+      "id": "P6",
+      "source": "designing-trust-pt tasks.json T12",
+      "de": {
+        "title": "Bildung",
+        "description": "Sechs Vorgänge sind im Schulamt eingegangen. Ordnen Sie sie nach Priorität."
+      },
+      "en": {
+        "title": "Education",
+        "description": "Six cases have come into the education office. Rank them by priority."
+      },
+      "target-order": [
+        4,
+        0,
+        1,
+        5,
+        3,
+        2
+      ],
+      "tiles": [
+        {
+          "key": 0,
+          "heat": [
+            36,
+            37,
+            21,
+            5,
+            1,
+            0
+          ],
+          "de": {
+            "text": "Prüfung startet ohne Sitzplan",
+            "description": "Die Prüfung beginnt innerhalb der nächsten Stunde ohne Sitzplan. Die Aufsicht setzt die Schüler von Hand.",
+            "thought": "Die Prüfung beginnt in einer Stunde – ein Sitzplan ist schnell gemacht."
+          },
+          "en": {
+            "text": "Exam starting without seating plan",
+            "description": "The session starts within the hour without a seating list. Invigilators seat pupils by hand.",
+            "thought": "The exam starts within the hour — a seating plan is quick to make."
+          }
+        },
+        {
+          "key": 1,
+          "heat": [
+            6,
+            23,
+            38,
+            26,
+            6,
+            1
+          ],
+          "de": {
+            "text": "Prüfung des Essensgeldanspruchs heute fällig",
+            "description": "Heute bis Dienstschluss zu prüfen, sonst zahlt die Familie und fordert die Differenz zurück.",
+            "thought": "Heute fällig, und es betrifft das Geld einer Familie."
+          },
+          "en": {
+            "text": "Free school meals check due today",
+            "description": "Verified before close today, or the family pays and reclaims the difference.",
+            "thought": "Due today, and it affects a family's money."
+          }
+        },
+        {
+          "key": 2,
+          "heat": [
+            0,
+            0,
+            1,
+            7,
+            30,
+            62
+          ],
+          "de": {
+            "text": "Freier Schulratssitz nicht ausgeschrieben",
+            "description": "In zwei Wochen zu veröffentlichen, sonst tagt das Gremium im nächsten Halbjahr unterhalb der Beschlussfähigkeit.",
+            "thought": "Eine Gremienbesetzung kann noch zwei Wochen warten."
+          },
+          "en": {
+            "text": "School governor vacancy not advertised",
+            "description": "Posted within a fortnight, or the board sits under quorum next term.",
+            "thought": "Filling a board seat can wait two more weeks."
+          }
+        },
+        {
+          "key": 3,
+          "heat": [
+            0,
+            1,
+            5,
+            24,
+            40,
+            30
+          ],
+          "de": {
+            "text": "Änderungen beim Schülertransport warten auf Einigung",
+            "description": "Im letzten Halbjahr beantragt. In zwei Wochen zu vereinbaren, sonst startet die neue Route nach den Ferien.",
+            "thought": "Die Route kommt notfalls nach den Ferien – zwei Wochen Zeit."
+          },
+          "en": {
+            "text": "School transport changes awaiting agreement",
+            "description": "Requested last term. Agreed within a fortnight, or the revised route starts after half term.",
+            "thought": "At worst the route starts after half term — two weeks left."
+          }
+        },
+        {
+          "key": 4,
+          "heat": [
+            57,
+            34,
+            8,
+            1,
+            0,
+            0
+          ],
+          "de": {
+            "text": "Frist für Schulplatz-Widerspruch endet bald",
+            "description": "Kein Termin festgelegt. Ist die Frist abgelaufen, kann die Zuweisung in diesem Jahr nicht mehr überprüft werden.",
+            "thought": "Nach Fristende bleibt das Kind ein ganzes Jahr an der falschen Schule."
+          },
+          "en": {
+            "text": "School placement appeal window closing",
+            "description": "No date set, but once the window closes the placement cannot be revisited this year.",
+            "thought": "Once the window closes, the child stays at the wrong school for a year."
+          }
+        },
+        {
+          "key": 5,
+          "heat": [
+            1,
+            6,
+            28,
+            37,
+            22,
+            6
+          ],
+          "de": {
+            "text": "Förderpläne überfällig zur Überprüfung",
+            "description": "Keine Überprüfung geplant oder vorgeschrieben. Mehrere Pläne eines Jahrgangs scheinen seit ihrer Erstellung nicht angesehen worden zu sein.",
+            "thought": "Förderpläne, die keiner ansieht, helfen den Schülern nicht."
+          },
+          "en": {
+            "text": "Student support plans overdue for review",
+            "description": "No review scheduled or required. Several plans in one year group appear not to have been looked at since.",
+            "thought": "Support plans that nobody reviews don't help the pupils."
+          }
+        }
+      ]
+    }
+  ]
+}
