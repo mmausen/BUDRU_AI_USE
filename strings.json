@@ -176,14 +176,7 @@
             "id": "mid_understood",
             "type": "likert",
             "scale": 7,
-            "label": "I understood how the AI was assisting me.",
-            "required": true
-          },
-          {
-            "id": "mid_clear_why",
-            "type": "likert",
-            "scale": 7,
-            "label": "It was clear why the AI behaved the way it did.",
+            "label": "I understood how the AI was helping me.",
             "required": true
           },
           {
@@ -208,24 +201,10 @@
             "required": true
           },
           {
-            "id": "mid_helpful",
-            "type": "likert",
-            "scale": 7,
-            "label": "The AI support was helpful.",
-            "required": true
-          },
-          {
             "id": "mid_easier",
             "type": "likert",
             "scale": 7,
             "label": "This interaction made the task easier to complete.",
-            "required": true
-          },
-          {
-            "id": "mid_natural",
-            "type": "likert",
-            "scale": 7,
-            "label": "Working with the AI felt natural.",
             "required": true
           },
           {
@@ -420,13 +399,6 @@
             "required": true
           },
           {
-            "id": "mid_clear_why",
-            "type": "likert",
-            "scale": 7,
-            "label": "Es war klar, warum sich die KI so verhalten hat.",
-            "required": true
-          },
-          {
             "id": "mid_control",
             "type": "likert",
             "scale": 7,
@@ -448,24 +420,10 @@
             "required": true
           },
           {
-            "id": "mid_helpful",
-            "type": "likert",
-            "scale": 7,
-            "label": "Die Unterstützung durch die KI war hilfreich.",
-            "required": true
-          },
-          {
             "id": "mid_easier",
             "type": "likert",
             "scale": 7,
             "label": "Diese Interaktion hat es leichter gemacht, die Aufgabe zu erledigen.",
-            "required": true
-          },
-          {
-            "id": "mid_natural",
-            "type": "likert",
-            "scale": 7,
-            "label": "Die Zusammenarbeit mit der KI fühlte sich natürlich an.",
             "required": true
           },
           {

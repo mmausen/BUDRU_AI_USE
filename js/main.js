@@ -6,9 +6,10 @@
 // A fresh task-to-interaction assignment for this session (see Config.RANDOM_TASK_ASSIGNMENT).
 // Used at session start and by the dev bar when the task set changes.
 function assignTasks() {
-  const order = Tasks.assign(Config.INTERACTIONS.length);
+  const list = Store.interactions();
+  const order = Tasks.assign(list.length);
   Store.setTaskOrder(order);
-  console.log("[BDR] tasks per interaction: " + Config.INTERACTIONS.map((k, i) => `${k}→${order[i]}`).join(", "));
+  console.log("[BDR] interaction order / tasks: " + list.map((k, i) => `${k}→${order[i]}`).join(", "));
 }
 
 /* ── DEV BAR ─────────────────────────────────────────────────────────

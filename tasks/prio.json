@@ -26,7 +26,7 @@
         "last": "Least urgent"
       }
     },
-    "notes": "Bilingual. STRUCTURE IS SHARED, PROSE IS PER LANGUAGE: id, tiles[].key, target-order and tiles[].heat exist once and cannot diverge between languages. target-order = tile keys top to bottom: the order the AI recommends. tiles[].heat = the probability (%) of that tile belonging in slot 1..6, used by the heatmap interaction; each row sums to 100 and each slot column to ~100. tiles[].<lang>.thought = the AI's first-person reasoning for the tile's placement (not displayed yet). The prototype shuffles the tiles."
+    "notes": "Bilingual. STRUCTURE IS SHARED, PROSE IS PER LANGUAGE: id, tiles[].key, target-order and tiles[].heat exist once and cannot diverge between languages. target-order = tile keys top to bottom: the order the AI recommends. tiles[].heat = the probability (%) of that tile belonging in slot 1..6, used by the heatmap interaction; each row sums to 100 and each slot column to ~100. tiles[].<lang>.thought = the AI's first-person reasoning for the tile's placement (not displayed yet). The prototype shuffles the tiles. v2 (shorter texts, timing only where it is the point of the case); the previous wording is kept in tasks/prio_v1_backup.json (not loaded)."
   },
   "tasks": [
     {
@@ -34,11 +34,11 @@
       "source": "designing-trust-pt tasks.json T1",
       "de": {
         "title": "Verkehr",
-        "description": "Sechs Vorgänge sind im Verkehrsreferat eingegangen. Ordnen Sie sie nach Priorität."
+        "description": "Ordnen Sie die Fälle nach Priorität."
       },
       "en": {
         "title": "Transportation",
-        "description": "Six cases have come into the transport desk. Rank them by priority."
+        "description": "Rank the cases by priority."
       },
       "target-order": [
         4,
@@ -60,14 +60,14 @@
             0
           ],
           "de": {
-            "text": "Falsche Umleitung in Straßensperrungsmitteilung",
-            "description": "Die Bekanntmachung geht innerhalb der nächsten Stunde in den Druck, die Umleitung ist unklar formuliert. Autofahrer fahren möglicherweise einen Umweg.",
-            "thought": "In einer Stunde ist der Druck raus; eine Zeile zu korrigieren kostet mich jetzt nur Minuten."
+            "text": "Falsche Umleitung in Sperrungsmitteilung",
+            "description": "Die Mitteilung geht gleich in Druck, die Umleitung ist unklar.",
+            "thought": "Eine Zeile jetzt korrigieren erspart Umwege."
           },
           "en": {
-            "text": "Incorrect diversion route in road closure notice",
-            "description": "The notice goes to print within the hour with an unclear diversion line. Drivers may take a longer way round.",
-            "thought": "It goes to print within the hour; fixing one line costs me minutes now."
+            "text": "Wrong diversion in closure notice",
+            "description": "The notice goes to print shortly with an unclear diversion route.",
+            "thought": "A one-line fix now saves drivers a detour."
           }
         },
         {
@@ -81,14 +81,14 @@
             6
           ],
           "de": {
-            "text": "Genehmigung für Umzugscontainer benötigt",
-            "description": "Antragsschluss ist heute bei Dienstschluss. Wird er verpasst, bucht der Anwohner den Container für nächste Woche neu.",
-            "thought": "Heute fällig, aber verpasst bedeutet nur eine Woche Aufschub für den Umzug."
+            "text": "Containergenehmigung für Umzug",
+            "description": "Kommt sie zu spät, verschiebt sich der Umzug um eine Woche.",
+            "thought": "Ärgerlich, aber nur eine Woche Verzug."
           },
           "en": {
-            "text": "Skip permit needed for house move",
-            "description": "Applications close when the office does today. Missed, the resident rebooks the skip for next week.",
-            "thought": "Due today, but missing it only pushes the move back a week."
+            "text": "Skip permit for a house move",
+            "description": "If it comes too late, the move slips by a week.",
+            "thought": "Annoying if missed, but only a week's delay."
           }
         },
         {
@@ -102,14 +102,14 @@
             62
           ],
           "de": {
-            "text": "Fehlendes Bushaltestellenschild",
-            "description": "Bestellung fällig innerhalb von zwei Wochen. Später fällt der Ersatz in die Charge des nächsten Quartals.",
-            "thought": "Ein fehlendes Schild ist ärgerlich, schlimmstenfalls kommt der Ersatz ein Quartal später."
+            "text": "Bushaltestellenschild fehlt",
+            "description": "Die Haltestelle ist in Betrieb, nur das Schild fehlt.",
+            "thought": "Der Bus hält trotzdem. Das kann warten."
           },
           "en": {
             "text": "Missing bus stop sign",
-            "description": "Order due within a fortnight. Later, the replacement falls into the next quarter's batch.",
-            "thought": "A missing sign is annoying; at worst the replacement comes a quarter later."
+            "description": "The stop is in service, but its sign is gone.",
+            "thought": "The bus still stops. This can wait."
           }
         },
         {
@@ -123,14 +123,14 @@
             29
           ],
           "de": {
-            "text": "Frist für Rückmeldungen zu Parkregelungen läuft bald ab",
-            "description": "Läuft seit dem Frühjahr, die Frist endet in zwei Wochen. Danach geht der Entwurf unverändert weiter.",
-            "thought": "Die Rückmeldefrist läuft noch zwei Wochen – wichtig, aber nicht heute."
+            "text": "Anhörung zur Parkzone",
+            "description": "Ohne Rückmeldung wird die Parkzone wie entworfen umgesetzt.",
+            "thought": "Eine Rückmeldung lohnt sich, schadet aber niemandem."
           },
           "en": {
-            "text": "Parking restrictions consultation closing soon",
-            "description": "Open since spring; responses close within a fortnight. After that the draft zone goes forward as written.",
-            "thought": "The consultation still has two weeks to run — important, but not today."
+            "text": "Parking zone consultation",
+            "description": "Without input, the draft parking zone goes ahead as written.",
+            "thought": "Worth a response, but nobody is harmed meanwhile."
           }
         },
         {
@@ -144,14 +144,14 @@
             0
           ],
           "de": {
-            "text": "Rollstuhlfahrer erreicht Gehweg nicht",
-            "description": "Kein Termin festgelegt. Der Anwohner gibt an, mit seinem Rollstuhl derzeit nicht auf den Gehweg zu kommen.",
-            "thought": "Jemand kommt gerade nicht sicher aus dem Haus – das wiegt schwerer als jede Frist."
+            "text": "Gehweg für Rollstuhl nicht erreichbar",
+            "description": "Ein Anwohner kommt mit dem Rollstuhl nicht auf den Gehweg.",
+            "thought": "Jemand kommt nicht sicher aus dem Haus. Das geht vor."
           },
           "en": {
-            "text": "Wheelchair user unable to access pavement",
-            "description": "No date set. The resident says they cannot currently get their wheelchair onto the pavement.",
-            "thought": "Someone can't get out of their home safely right now — that outweighs any deadline."
+            "text": "Pavement blocked for wheelchair user",
+            "description": "A resident can't get onto the pavement with their wheelchair.",
+            "thought": "Someone can't safely leave home. That comes first."
           }
         },
         {
@@ -165,14 +165,14 @@
             3
           ],
           "de": {
-            "text": "Meldungen über unebenen Gehweg in einer Straße",
-            "description": "Keine Prüfung geplant oder vorgeschrieben. Drei Anwohner haben unabhängig voneinander unebene Platten vor der Praxis erwähnt.",
-            "thought": "Unebene Platten vor einer Arztpraxis sind ein Sturzrisiko, und drei Meldungen sind ein Muster."
+            "text": "Unebener Gehweg vor Arztpraxis",
+            "description": "Drei Anwohner melden lose Platten vor der Arztpraxis.",
+            "thought": "Lose Platten vor einer Praxis sind ein Sturzrisiko."
           },
           "en": {
-            "text": "Reports of uneven paving on one street",
-            "description": "No inspection scheduled or required. Three residents have separately mentioned uneven paving outside the surgery.",
-            "thought": "Uneven paving outside a surgery is a fall risk, and three reports make a pattern."
+            "text": "Uneven paving outside a surgery",
+            "description": "Three residents have reported loose slabs outside the doctor's surgery.",
+            "thought": "Loose slabs outside a surgery are a fall risk."
           }
         }
       ]
@@ -182,11 +182,11 @@
       "source": "designing-trust-pt tasks.json T2",
       "de": {
         "title": "Wohnen",
-        "description": "Sechs Vorgänge sind im Wohnungsamt eingegangen. Ordnen Sie sie nach Priorität."
+        "description": "Ordnen Sie die Fälle nach Priorität."
       },
       "en": {
         "title": "Housing",
-        "description": "Six cases have come into the housing office. Rank them by priority."
+        "description": "Rank the cases by priority."
       },
       "target-order": [
         4,
@@ -208,14 +208,14 @@
             1
           ],
           "de": {
-            "text": "Wohnungsbesichtigung scheitert an fehlendem Zugangscode",
-            "description": "Die Besichtigung beginnt innerhalb der nächsten Stunde, der Code des Schlüsseltresors wurde nicht übermittelt. Der Interessent wartet draußen.",
-            "thought": "Der Interessent steht schon draußen; den Code zu schicken dauert eine Minute."
+            "text": "Besichtigung ohne Zugangscode",
+            "description": "Ein Interessent wartet draußen ohne Code für den Schlüsseltresor.",
+            "thought": "Jemand wartet gerade; der Code ist schnell geschickt."
           },
           "en": {
-            "text": "Property viewing blocked by missing access code",
-            "description": "A viewing starts within the hour and the key safe code has not been shared. The applicant waits outside.",
-            "thought": "The applicant is already waiting outside; sending the code takes a minute."
+            "text": "Viewing blocked: no access code",
+            "description": "An applicant is waiting outside without the key safe code.",
+            "thought": "Someone is waiting right now; sending a code takes a minute."
           }
         },
         {
@@ -229,14 +229,14 @@
             7
           ],
           "de": {
-            "text": "Kautionsregistrierung heute fällig",
-            "description": "Heute bis Dienstschluss einzureichen, sonst werden die Mietunterlagen neu ausgestellt.",
-            "thought": "Heute fällig, sonst nur neuer Papierkram – lästig, aber reparabel."
+            "text": "Registrierung der Mietkaution",
+            "description": "Wird sie versäumt, müssen die Mietunterlagen neu ausgestellt werden.",
+            "thought": "Lästig, wenn versäumt, aber reparabel."
           },
           "en": {
-            "text": "Tenant deposit registration due today",
-            "description": "Lodged before close today, or the tenancy paperwork is reissued.",
-            "thought": "Due today, otherwise just new paperwork — tedious, but fixable."
+            "text": "Tenant deposit registration",
+            "description": "If missed, the tenancy paperwork has to be reissued.",
+            "thought": "Tedious if missed, but fixable."
           }
         },
         {
@@ -250,14 +250,14 @@
             62
           ],
           "de": {
-            "text": "Vertrag für Mülllagerung muss erneuert werden",
-            "description": "Liegt seit März, Verlängerung fällig in zwei Wochen. Verspätet wird der Regelsatz statt des vereinbarten Satzes berechnet.",
-            "thought": "Hier geht es nur um einen Tarif für die Mülllagerung."
+            "text": "Vertrag für Müllplatz verlängern",
+            "description": "Ohne Verlängerung zahlt das Haus den Regelsatz.",
+            "thought": "Hier geht es nur um den Tarif."
           },
           "en": {
-            "text": "Bin store agreement needs renewal",
-            "description": "Pending since March; renewal due within a fortnight. Late, the block is billed at the standard rate.",
-            "thought": "This is only about the rate for the bin store."
+            "text": "Bin store contract renewal",
+            "description": "If not renewed, the building pays the standard rate.",
+            "thought": "Only a matter of the rate."
           }
         },
         {
@@ -271,14 +271,14 @@
             30
           ],
           "de": {
-            "text": "Wohnungsanpassung wartet auf Angebot",
-            "description": "Angebote fällig in zwei Wochen, sonst geht der Vorgang ans Ende der Prüfliste.",
-            "thought": "Die Anpassung ist für jemanden wichtig, aber die Frist läuft noch zwei Wochen."
+            "text": "Wohnungsanpassung wartet auf Angebote",
+            "description": "Ohne Angebote rutscht der Fall ans Ende der Liste.",
+            "thought": "Wichtig für jemanden, aber es ist noch Zeit."
           },
           "en": {
-            "text": "Home adaptation awaiting contractor quote",
-            "description": "Quotes due within a fortnight, or the file returns to the back of the assessment list.",
-            "thought": "The adaptation matters to someone, but there are two weeks left."
+            "text": "Home adaptation awaiting quotes",
+            "description": "Without quotes, the case goes back to the end of the list.",
+            "thought": "It matters to someone, but there is time."
           }
         },
         {
@@ -292,14 +292,14 @@
             0
           ],
           "de": {
-            "text": "Bewohner wartet auf Nachfolgeregelung",
-            "description": "Kein Termin festgelegt. Wird der Anspruch nicht vor Mietende entschieden, kann er nicht wieder aufgenommen werden.",
-            "thought": "Verpasst man diese Entscheidung, verliert jemand sein Zuhause – endgültig."
+            "text": "Antrag auf Mietnachfolge",
+            "description": "Wird nicht vor Mietende entschieden, verliert der Bewohner die Wohnung.",
+            "thought": "Verpasst, verliert jemand endgültig sein Zuhause."
           },
           "en": {
-            "text": "Resident awaiting succession decision",
-            "description": "No date set. If the claim is not decided before the tenancy ends it cannot be reopened.",
-            "thought": "If this decision is missed, someone loses their home — for good."
+            "text": "Tenancy succession claim",
+            "description": "If not decided before the tenancy ends, the resident loses their home.",
+            "thought": "Missing this costs someone their home for good."
           }
         },
         {
@@ -313,14 +313,14 @@
             0
           ],
           "de": {
-            "text": "Mehrere Haushalte melden Feuchtigkeit",
-            "description": "Keine Prüfung geplant oder vorgeschrieben. Vier Haushalte eines Treppenhauses melden seit dem Frühjahr dasselbe.",
-            "thought": "Vier Haushalte mit Feuchtigkeit seit dem Frühjahr – das ist ein Gesundheitsthema."
+            "text": "Feuchtigkeit in mehreren Wohnungen",
+            "description": "Vier Wohnungen eines Treppenhauses melden Feuchtigkeit.",
+            "thought": "Feuchtigkeit in vier Wohnungen ist ein Gesundheitsthema."
           },
           "en": {
-            "text": "Damp reported by multiple households",
-            "description": "No inspection scheduled or required. Four households on one stairwell have reported the same thing since spring.",
-            "thought": "Four households with damp since spring — that is a health issue."
+            "text": "Damp in several flats",
+            "description": "Four flats on one stairwell report damp.",
+            "thought": "Damp across four homes is a health problem."
           }
         }
       ]
@@ -330,11 +330,11 @@
       "source": "designing-trust-pt tasks.json T5",
       "de": {
         "title": "Öffentliche Sicherheit",
-        "description": "Sechs Vorgänge sind bei der Ordnungsbehörde eingegangen. Ordnen Sie sie nach Priorität."
+        "description": "Ordnen Sie die Fälle nach Priorität."
       },
       "en": {
         "title": "Public Safety",
-        "description": "Six cases have come into the public safety team. Rank them by priority."
+        "description": "Rank the cases by priority."
       },
       "target-order": [
         4,
@@ -356,14 +356,14 @@
             5
           ],
           "de": {
-            "text": "Veranstaltungspersonal ohne Unterlagen",
-            "description": "Die Ordner kommen innerhalb der nächsten Stunde, die Unterlagen sind nicht gedruckt. Sie werden am Handy eingewiesen.",
-            "thought": "Die Einweisung klappt notfalls auch am Handy – aber es ist in einer Stunde."
+            "text": "Ordner ohne Einweisungsunterlagen",
+            "description": "Die Ordner kommen gleich, die Unterlagen sind nicht gedruckt.",
+            "thought": "Notfalls geht die Einweisung auch am Handy."
           },
           "en": {
-            "text": "Event staff missing briefing materials",
-            "description": "Marshals arrive within the hour and the pack is unprinted. They brief from a phone screen instead.",
-            "thought": "The briefing works from a phone if it must — but it is within the hour."
+            "text": "Event staff without briefing pack",
+            "description": "Marshals arrive shortly and the briefing pack isn't printed.",
+            "thought": "They can brief from a phone if needed."
           }
         },
         {
@@ -377,14 +377,14 @@
             29
           ],
           "de": {
-            "text": "Änderung einer Gewerbeerlaubnis heute fällig",
-            "description": "Heute bis Dienstschluss einzureichen, sonst gilt die Änderung erst ab dem Folgemonat.",
-            "thought": "Heute fällig, verspätet gilt die Änderung nur einen Monat später."
+            "text": "Änderung einer Gewerbeerlaubnis",
+            "description": "Verspätet gilt die Änderung erst ab nächstem Monat.",
+            "thought": "Verspätet heißt nur einen Monat später."
           },
           "en": {
-            "text": "Business licence change due today",
-            "description": "Lodged before close today, or the variation applies only from the following month.",
-            "thought": "Due today; late, the change simply applies a month later."
+            "text": "Business licence change",
+            "description": "If late, the change only applies from next month.",
+            "thought": "Late just means a month later."
           }
         },
         {
@@ -398,14 +398,14 @@
             4
           ],
           "de": {
-            "text": "Videoaufnahmen könnten verloren gehen",
-            "description": "In zwei Wochen anzufordern, sonst wird das Material im üblichen Turnus überschrieben.",
-            "thought": "Ist das Material überschrieben, ist das Beweismittel für immer weg."
+            "text": "Videoaufnahmen drohen verloren zu gehen",
+            "description": "Die Aufnahmen werden überschrieben, wenn niemand sie anfordert.",
+            "thought": "Einmal überschrieben, ist das Beweismittel weg."
           },
           "en": {
-            "text": "CCTV footage at risk of being lost",
-            "description": "Requested within a fortnight, or the footage is overwritten on the normal cycle.",
-            "thought": "Once the footage is overwritten, the evidence is gone for good."
+            "text": "CCTV footage about to be lost",
+            "description": "The footage will be overwritten unless someone requests it.",
+            "thought": "Once overwritten, the evidence is gone for good."
           }
         },
         {
@@ -419,14 +419,14 @@
             62
           ],
           "de": {
-            "text": "Frist für Sicherheitsförderung nähert sich",
-            "description": "Die Gruppe hat im März erstmals gefragt. Einreichung in zwei Wochen, sonst wartet sie auf die nächste Runde.",
-            "thought": "Die Gruppe wartet schlimmstenfalls auf die nächste Förderrunde."
+            "text": "Antrag auf Sicherheitsförderung",
+            "description": "Verpasst, wartet die Initiative auf die nächste Förderrunde.",
+            "thought": "Schlimmstenfalls wartet die Initiative ein Jahr."
           },
           "en": {
-            "text": "Community safety grant deadline approaching",
-            "description": "The group first asked in March. Submitted within a fortnight, or they wait for next year's round.",
-            "thought": "At worst the group waits for the next funding round."
+            "text": "Community safety grant application",
+            "description": "If missed, the group waits for next year's funding round.",
+            "thought": "At worst they wait for the next round."
           }
         },
         {
@@ -440,14 +440,14 @@
             0
           ],
           "de": {
-            "text": "Schülerlotsenstelle unbesetzt",
-            "description": "Kein Termin festgelegt. Die Stelle vor der Grundschule ist seit Schuljahresbeginn unbesetzt.",
-            "thought": "Jeden Morgen überqueren Grundschulkinder dort die Straße – ohne Lotsen."
+            "text": "Kein Schülerlotse",
+            "description": "Am Übergang vor der Grundschule steht dieses Schuljahr kein Lotse.",
+            "thought": "Kinder überqueren dort jeden Morgen ungeschützt die Straße."
           },
           "en": {
-            "text": "School crossing patrol position vacant",
-            "description": "No date set. The post outside the primary school has been unfilled since term began.",
-            "thought": "Primary school children cross there every morning — with no patrol."
+            "text": "No school crossing patrol",
+            "description": "Nobody has staffed the crossing outside the primary school this term.",
+            "thought": "Young children cross there every morning unprotected."
           }
         },
         {
@@ -461,14 +461,14 @@
             0
           ],
           "de": {
-            "text": "Meldungen über beschädigtes Kanalgeländer",
-            "description": "Keine Prüfung geplant oder vorgeschrieben. Spaziergänger haben dreimal eine Lücke im Geländer erwähnt.",
-            "thought": "Eine Lücke im Geländer am Kanal kann jemanden ins Wasser fallen lassen."
+            "text": "Beschädigtes Kanalgeländer",
+            "description": "Spaziergänger melden eine Lücke im Geländer am Kanal.",
+            "thought": "Eine Lücke am Wasser ist ein echtes Sturzrisiko."
           },
           "en": {
-            "text": "Reports of damaged canal railing",
-            "description": "No inspection scheduled or required. Walkers have mentioned a gap in the railing on three occasions.",
-            "thought": "A gap in a canal railing can let someone fall into the water."
+            "text": "Damaged canal railing",
+            "description": "Walkers report a gap in the railing along the canal.",
+            "thought": "A gap by the water is a real fall risk."
           }
         }
       ]
@@ -478,11 +478,11 @@
       "source": "designing-trust-pt tasks.json T7",
       "de": {
         "title": "Soziale Hilfen",
-        "description": "Sechs Vorgänge sind bei den sozialen Hilfen eingegangen. Ordnen Sie sie nach Priorität."
+        "description": "Ordnen Sie die Fälle nach Priorität."
       },
       "en": {
         "title": "Social Support",
-        "description": "Six cases have come into social support. Rank them by priority."
+        "description": "Rank the cases by priority."
       },
       "target-order": [
         1,
@@ -504,14 +504,14 @@
             1
           ],
           "de": {
-            "text": "Termin ohne Dolmetscherunterstützung",
-            "description": "Der Termin beginnt innerhalb der nächsten Stunde ohne gebuchten Dolmetscher. Er muss verlegt werden.",
-            "thought": "Ohne Dolmetscher platzt der Termin in einer Stunde – jetzt noch zu retten."
+            "text": "Termin ohne Dolmetscher",
+            "description": "Ein Termin beginnt gleich, ohne gebuchten Dolmetscher.",
+            "thought": "Ohne Dolmetscher platzt der Termin, noch ist er zu retten."
           },
           "en": {
-            "text": "Appointment missing interpreter support",
-            "description": "The appointment begins within the hour with no interpreter booked. It will need rescheduling.",
-            "thought": "Without an interpreter the appointment fails within the hour — still saveable now."
+            "text": "No interpreter for appointment",
+            "description": "An appointment is about to start with no interpreter booked.",
+            "thought": "Without an interpreter the appointment fails, and it can still be saved."
           }
         },
         {
@@ -525,14 +525,14 @@
             1
           ],
           "de": {
-            "text": "Antrag auf Soforthilfe heute fällig",
-            "description": "Heute bis Dienstschluss einzureichen, sonst fällt die Zahlung in den Lauf des nächsten Monats.",
-            "thought": "Soforthilfe heißt: Jemand braucht das Geld jetzt, nicht im nächsten Monat."
+            "text": "Antrag auf Soforthilfe",
+            "description": "Jemand braucht Soforthilfe; verspätet kommt sie erst nächsten Monat.",
+            "thought": "Soforthilfe heißt: Das Geld wird jetzt gebraucht."
           },
           "en": {
-            "text": "Emergency support application due today",
-            "description": "Lodged before close today, or the payment falls into next month's run.",
-            "thought": "Emergency support means someone needs the money now, not next month."
+            "text": "Emergency support application",
+            "description": "Someone needs an emergency payment; if late, it moves to next month.",
+            "thought": "Emergency means the money is needed now."
           }
         },
         {
@@ -546,14 +546,14 @@
             30
           ],
           "de": {
-            "text": "Unterlagen zur Pflegeprüfung überfällig",
-            "description": "In zwei Wochen zurückzusenden, sonst ruhen die Zahlungen bis zur Wiederaufnahme des Vorgangs.",
-            "thought": "Zahlungen könnten ruhen, aber es bleiben noch zwei Wochen."
+            "text": "Unterlagen zur Pflegeprüfung",
+            "description": "Ohne Rücksendung ruhen die Zahlungen an die Pflegeperson.",
+            "thought": "Zahlungen könnten ruhen, aber es ist noch Zeit."
           },
           "en": {
-            "text": "Caregiver review paperwork overdue",
-            "description": "Returned within a fortnight, or payments pause until the file is reopened.",
-            "thought": "Payments could pause, but there are still two weeks."
+            "text": "Caregiver review paperwork",
+            "description": "If not returned, the caregiver's payments pause.",
+            "thought": "Payments could pause, but there is still time."
           }
         },
         {
@@ -567,13 +567,13 @@
             62
           ],
           "de": {
-            "text": "Beförderungsregelung wartet auf Genehmigung",
-            "description": "Seit dem Frühjahr in Abstimmung. In zwei Wochen zu unterzeichnen, sonst gilt wieder die teurere Regelung.",
+            "text": "Beförderungsregelung freigeben",
+            "description": "Ohne Freigabe gilt wieder die teurere Regelung.",
             "thought": "Hier geht es um Kosten, nicht um eine Notlage."
           },
           "en": {
-            "text": "Transport arrangements awaiting approval",
-            "description": "Under discussion since spring. Signed within a fortnight, or the route reverts to the costlier arrangement.",
+            "text": "Transport arrangement approval",
+            "description": "Without sign-off, the route reverts to a costlier option.",
             "thought": "This is about cost, not about anyone in need."
           }
         },
@@ -588,14 +588,14 @@
             0
           ],
           "de": {
-            "text": "Anspruch auf Nachzahlung gefährdet",
-            "description": "Kein Termin festgelegt. Ist die Frist verstrichen, kann der zurückliegende Zeitraum nicht mehr beansprucht werden.",
-            "thought": "Läuft die Frist ab, ist der Anspruch unwiderruflich verloren."
+            "text": "Nachzahlungsanspruch gefährdet",
+            "description": "Verstreicht die Frist, ist der Anspruch für den Zeitraum verloren.",
+            "thought": "Einmal verloren, ist der Anspruch weg."
           },
           "en": {
-            "text": "Benefit backdating eligibility at risk",
-            "description": "No date set, but once the window passes the earlier period cannot be claimed.",
-            "thought": "Once the window passes, the claim is lost for good."
+            "text": "Benefit backdating at risk",
+            "description": "If the window passes, the earlier period can no longer be claimed.",
+            "thought": "Once lost, the claim can't be recovered."
           }
         },
         {
@@ -609,14 +609,14 @@
             6
           ],
           "de": {
-            "text": "Fälle ohne zuständige Sachbearbeitung",
-            "description": "Kein Termin festgelegt und keine Neuverteilung vorgesehen. Rund elf Vorgänge scheinen seit Juni ohne zuständige Person zu sein.",
-            "thought": "Elf Fälle ohne Ansprechperson – da kann unbemerkt viel schiefgehen."
+            "text": "Fälle ohne Sachbearbeitung",
+            "description": "Rund elf Akten haben seit Juni keine zuständige Person.",
+            "thought": "Ohne Zuständige bleiben Probleme unbemerkt."
           },
           "en": {
-            "text": "Cases without assigned caseworker",
-            "description": "No date set and no reallocation planned. Around eleven files appear to have had no named worker since June.",
-            "thought": "Eleven cases with nobody responsible — a lot can go wrong unnoticed."
+            "text": "Cases without a caseworker",
+            "description": "About eleven files have had no named caseworker since June.",
+            "thought": "With nobody responsible, problems go unnoticed."
           }
         }
       ]
@@ -626,11 +626,11 @@
       "source": "designing-trust-pt tasks.json T9",
       "de": {
         "title": "Bauwesen",
-        "description": "Sechs Vorgänge sind im Bauamt eingegangen. Ordnen Sie sie nach Priorität."
+        "description": "Ordnen Sie die Fälle nach Priorität."
       },
       "en": {
         "title": "Building & Construction",
-        "description": "Six cases have come into the building control office. Rank them by priority."
+        "description": "Rank the cases by priority."
       },
       "target-order": [
         5,
@@ -652,14 +652,14 @@
             6
           ],
           "de": {
-            "text": "Falsche Kontaktdaten auf Baustellenschild",
-            "description": "Der Bauzaun wird innerhalb der nächsten Stunde gestellt, mit falschem Ansprechpartner. Nachbarn rufen die falsche Stelle an.",
-            "thought": "Falsche Nummer am Bauzaun ist ärgerlich, aber schnell korrigiert."
+            "text": "Falscher Kontakt auf Bauschild",
+            "description": "Nachbarn rufen bei der falschen Stelle an.",
+            "thought": "Ärgerlich, aber schnell korrigiert."
           },
           "en": {
-            "text": "Incorrect contact details on site notice",
-            "description": "The hoarding goes up within the hour with the wrong contact name. Neighbours call the wrong desk.",
-            "thought": "A wrong number on the hoarding is annoying, but quickly corrected."
+            "text": "Wrong contact on site notice",
+            "description": "Neighbours will call the wrong desk.",
+            "thought": "Annoying, but quickly corrected."
           }
         },
         {
@@ -673,14 +673,14 @@
             1
           ],
           "de": {
-            "text": "Beginn der Gerüstgenehmigung unbestätigt",
-            "description": "Heute bis Dienstschluss zu bestätigen, sonst stellt die Firma einen Stillstandstag in Rechnung.",
-            "thought": "Heute fällig, sonst kostet es einen Stillstandstag."
+            "text": "Startdatum Gerüstgenehmigung",
+            "description": "Unbestätigt stellt die Firma einen Stillstandstag in Rechnung.",
+            "thought": "Versäumt kostet es einen Stillstandstag."
           },
           "en": {
-            "text": "Scaffold permit start date unconfirmed",
-            "description": "Confirmed before close today, or the contractor bills for an idle day.",
-            "thought": "Due today, otherwise it costs an idle day."
+            "text": "Scaffold permit start date",
+            "description": "If unconfirmed, the contractor bills for an idle day.",
+            "thought": "It costs an idle day if missed."
           }
         },
         {
@@ -694,14 +694,14 @@
             31
           ],
           "de": {
-            "text": "Baumaßnahme noch nicht erfasst",
-            "description": "In zwei Wochen zu erfassen, sonst beginnt die Frist der Nachbarn von vorn.",
-            "thought": "Erfassen in zwei Wochen reicht; sonst beginnt nur eine Frist neu."
+            "text": "Bauanzeige nicht erfasst",
+            "description": "Nicht erfasst, beginnt die Einspruchsfrist der Nachbarn neu.",
+            "thought": "Schlimmstenfalls beginnt eine Frist neu."
           },
           "en": {
-            "text": "Building work notification not recorded",
-            "description": "Logged within a fortnight, or the neighbours' response period starts again.",
-            "thought": "Logging it within two weeks is enough; otherwise a period just restarts."
+            "text": "Building notice not recorded",
+            "description": "If unrecorded, the neighbours' response period starts again.",
+            "thought": "At worst a period restarts."
           }
         },
         {
@@ -715,14 +715,14 @@
             62
           ],
           "de": {
-            "text": "Frist für Denkmalschutz-Rückmeldungen läuft bald ab",
-            "description": "Seit letztem Monat ausgehängt. Stellungnahmen fällig in zwei Wochen, sonst entscheidet allein der Amtsbericht.",
-            "thought": "Die Rückmeldefrist läuft noch, und ein Amtsbericht liegt ohnehin vor."
+            "text": "Anhörung zum Denkmalbereich",
+            "description": "Ohne Stellungnahmen entscheidet allein der Amtsbericht.",
+            "thought": "Ein Amtsbericht liegt ohnehin vor."
           },
           "en": {
-            "text": "Conservation area consultation closing soon",
-            "description": "Advertised last month. Responses due within a fortnight, or it proceeds on the officer's report alone.",
-            "thought": "Responses are still open, and there is an officer's report anyway."
+            "text": "Conservation area consultation",
+            "description": "Without responses, the decision rests on the officer's report.",
+            "thought": "There is an officer's report either way."
           }
         },
         {
@@ -736,14 +736,14 @@
             0
           ],
           "de": {
-            "text": "Fall unerlaubter Bauarbeiten gefährdet",
-            "description": "Kein Termin festgelegt. Nach Ablauf der Vierjahresfrist sind die Arbeiten nicht mehr angreifbar.",
-            "thought": "Nach vier Jahren ist der Fall nicht mehr angreifbar – das lässt sich nicht nachholen."
+            "text": "Unerlaubte Bauarbeiten",
+            "description": "Nach vier Jahren sind die Arbeiten nicht mehr angreifbar.",
+            "thought": "Ist die Frist um, lässt sich nichts mehr machen."
           },
           "en": {
-            "text": "Unauthorised building work case at risk",
-            "description": "No date set, but once the four-year period passes the works can no longer be challenged.",
-            "thought": "After four years the case can no longer be pursued — no way to catch up later."
+            "text": "Unauthorised building work",
+            "description": "After four years, the works can no longer be challenged.",
+            "thought": "Once the period runs out, it can't be undone."
           }
         },
         {
@@ -757,14 +757,14 @@
             0
           ],
           "de": {
-            "text": "Sorgen wegen Bewegung einer Stützmauer",
-            "description": "Keine Begutachtung geplant oder vorgeschrieben. Zwei Kleingärtner sagen, die Mauer sehe anders aus als im Vorjahr.",
-            "thought": "Eine Stützmauer, die sich bewegt, kann einstürzen – das prüfe ich zuerst."
+            "text": "Stützmauer bewegt sich womöglich",
+            "description": "Kleingärtner sagen, die Mauer habe sich seit letztem Jahr verschoben.",
+            "thought": "Eine Stützmauer in Bewegung kann einstürzen. Zuerst prüfen."
           },
           "en": {
-            "text": "Concerns about retaining wall movement",
-            "description": "No survey scheduled or required. Two allotment holders have said the wall looks different from last year.",
-            "thought": "A retaining wall that is moving can collapse — I check that first."
+            "text": "Retaining wall may be moving",
+            "description": "Allotment holders say the wall has shifted since last year.",
+            "thought": "A moving retaining wall can collapse. I'd check it first."
           }
         }
       ]
@@ -774,11 +774,11 @@
       "source": "designing-trust-pt tasks.json T12",
       "de": {
         "title": "Bildung",
-        "description": "Sechs Vorgänge sind im Schulamt eingegangen. Ordnen Sie sie nach Priorität."
+        "description": "Ordnen Sie die Fälle nach Priorität."
       },
       "en": {
         "title": "Education",
-        "description": "Six cases have come into the education office. Rank them by priority."
+        "description": "Rank the cases by priority."
       },
       "target-order": [
         4,
@@ -800,14 +800,14 @@
             0
           ],
           "de": {
-            "text": "Prüfung startet ohne Sitzplan",
-            "description": "Die Prüfung beginnt innerhalb der nächsten Stunde ohne Sitzplan. Die Aufsicht setzt die Schüler von Hand.",
-            "thought": "Die Prüfung beginnt in einer Stunde – ein Sitzplan ist schnell gemacht."
+            "text": "Prüfung ohne Sitzplan",
+            "description": "Eine Prüfung beginnt gleich ohne Sitzplan.",
+            "thought": "Schnell gemacht und sofort gebraucht."
           },
           "en": {
-            "text": "Exam starting without seating plan",
-            "description": "The session starts within the hour without a seating list. Invigilators seat pupils by hand.",
-            "thought": "The exam starts within the hour — a seating plan is quick to make."
+            "text": "Exam without seating plan",
+            "description": "An exam is about to start without a seating plan.",
+            "thought": "Quick to make, and needed right now."
           }
         },
         {
@@ -821,14 +821,14 @@
             1
           ],
           "de": {
-            "text": "Prüfung des Essensgeldanspruchs heute fällig",
-            "description": "Heute bis Dienstschluss zu prüfen, sonst zahlt die Familie und fordert die Differenz zurück.",
-            "thought": "Heute fällig, und es betrifft das Geld einer Familie."
+            "text": "Prüfung Essensgeld",
+            "description": "Ungeprüft zahlt die Familie und fordert das Geld später zurück.",
+            "thought": "Es betrifft das Geld einer Familie."
           },
           "en": {
-            "text": "Free school meals check due today",
-            "description": "Verified before close today, or the family pays and reclaims the difference.",
-            "thought": "Due today, and it affects a family's money."
+            "text": "Free school meals check",
+            "description": "If unchecked, the family pays and reclaims the money later.",
+            "thought": "It affects a family's money."
           }
         },
         {
@@ -842,14 +842,14 @@
             62
           ],
           "de": {
-            "text": "Freier Schulratssitz nicht ausgeschrieben",
-            "description": "In zwei Wochen zu veröffentlichen, sonst tagt das Gremium im nächsten Halbjahr unterhalb der Beschlussfähigkeit.",
-            "thought": "Eine Gremienbesetzung kann noch zwei Wochen warten."
+            "text": "Freier Sitz im Schulgremium",
+            "description": "Unbesetzt ist das Gremium nächstes Halbjahr womöglich nicht beschlussfähig.",
+            "thought": "Eine Gremienbesetzung kann warten."
           },
           "en": {
-            "text": "School governor vacancy not advertised",
-            "description": "Posted within a fortnight, or the board sits under quorum next term.",
-            "thought": "Filling a board seat can wait two more weeks."
+            "text": "School governor vacancy",
+            "description": "If unfilled, the board may lack a quorum next term.",
+            "thought": "Filling a board seat can wait."
           }
         },
         {
@@ -863,14 +863,14 @@
             30
           ],
           "de": {
-            "text": "Änderungen beim Schülertransport warten auf Einigung",
-            "description": "Im letzten Halbjahr beantragt. In zwei Wochen zu vereinbaren, sonst startet die neue Route nach den Ferien.",
-            "thought": "Die Route kommt notfalls nach den Ferien – zwei Wochen Zeit."
+            "text": "Änderung Schülertransport",
+            "description": "Ohne Einigung startet die neue Route erst nach den Ferien.",
+            "thought": "Schlimmstenfalls startet die Route etwas später."
           },
           "en": {
-            "text": "School transport changes awaiting agreement",
-            "description": "Requested last term. Agreed within a fortnight, or the revised route starts after half term.",
-            "thought": "At worst the route starts after half term — two weeks left."
+            "text": "School transport changes",
+            "description": "Without agreement, the new route starts after half term.",
+            "thought": "At worst the route starts a little later."
           }
         },
         {
@@ -884,14 +884,14 @@
             0
           ],
           "de": {
-            "text": "Frist für Schulplatz-Widerspruch endet bald",
-            "description": "Kein Termin festgelegt. Ist die Frist abgelaufen, kann die Zuweisung in diesem Jahr nicht mehr überprüft werden.",
-            "thought": "Nach Fristende bleibt das Kind ein ganzes Jahr an der falschen Schule."
+            "text": "Widerspruch gegen Schulplatz",
+            "description": "Nach Fristende bleibt das Kind ein Jahr an der zugewiesenen Schule.",
+            "thought": "Verpasst, ist ein Kind ein Jahr an der falschen Schule."
           },
           "en": {
-            "text": "School placement appeal window closing",
-            "description": "No date set, but once the window closes the placement cannot be revisited this year.",
-            "thought": "Once the window closes, the child stays at the wrong school for a year."
+            "text": "School placement appeal",
+            "description": "If the window closes, the child stays at the assigned school for the year.",
+            "thought": "Missed, a child spends a year at the wrong school."
           }
         },
         {
@@ -905,14 +905,14 @@
             6
           ],
           "de": {
-            "text": "Förderpläne überfällig zur Überprüfung",
-            "description": "Keine Überprüfung geplant oder vorgeschrieben. Mehrere Pläne eines Jahrgangs scheinen seit ihrer Erstellung nicht angesehen worden zu sein.",
-            "thought": "Förderpläne, die keiner ansieht, helfen den Schülern nicht."
+            "text": "Förderpläne ungeprüft",
+            "description": "Mehrere Förderpläne wurden seit ihrer Erstellung nicht geprüft.",
+            "thought": "Ungeprüfte Pläne helfen den Schülern nicht."
           },
           "en": {
-            "text": "Student support plans overdue for review",
-            "description": "No review scheduled or required. Several plans in one year group appear not to have been looked at since.",
-            "thought": "Support plans that nobody reviews don't help the pupils."
+            "text": "Support plans not reviewed",
+            "description": "Several pupils' support plans haven't been reviewed since they were written.",
+            "thought": "Plans nobody reviews don't help pupils."
           }
         }
       ]

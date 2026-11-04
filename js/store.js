@@ -36,6 +36,13 @@ window.Store = (function () {
   // Master switch (Config.CONFIG.fileLogging). Off → nothing is POSTed, so no files are written.
   const logging = () => Config.CONFIG.fileLogging === true;
 
+  // Fisher–Yates on a copy.
+  function shuffle(a) {
+    a = a.slice();
+    for (let i = a.length - 1; i > 0; i--) { const j = 0 | (Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+    return a;
+  }
+
   // Local time as ISO 8601 with the UTC offset, e.g. 2026-11-04T10:21:33.120+01:00.
   const pad = (n, w) => String(n).padStart(w || 2, "0");
   function localIso(d) {
@@ -67,7 +74,9 @@ window.Store = (function () {
       logFolder: Config.STEPS.anonId ? null : folderName(pid, now),
       config: { ...Config.CONFIG },
       steps: { ...Config.STEPS },         // snapshotted, so a run stays interpretable later
-      interactions: Config.INTERACTIONS.slice(),
+      // The running order of the AI interactions for this participant.
+      interactions: Config.RANDOM_INTERACTION_ORDER ? shuffle(Config.INTERACTIONS) : Config.INTERACTIONS.slice(),
+      interactionOrderRandom: !!Config.RANDOM_INTERACTION_ORDER,
       taskSet: null,                      // placeholder | fixed | prio (see setTasks)
       taskSource: null,                   // "config" | "dev" (picked in the dev bar)
       lang: null,                         // "en" | "de" — interface, questionnaires and tasks
@@ -86,6 +95,8 @@ window.Store = (function () {
   }
 
   function get() { return data; }
+  // This session's interaction order (falls back to the config order before a session exists).
+  function interactions() { return data && data.interactions ? data.interactions.slice() : Config.INTERACTIONS.slice(); }
   function setStep(i) { if (data) { data.currentStep = i; save(); } }
   // The typed ID also fixes the log folder: <timestamp of entry>_<ID>. Set once per session.
   function setAnonId(v) {
@@ -261,7 +272,7 @@ window.Store = (function () {
 
   return {
     SCHEMA_VERSION,
-    newSession, get, setStep, setAnonId, anonId, setTasks, setLang, setTaskOrder,
+    newSession, get, interactions, setStep, setAnonId, anonId, setTasks, setLang, setTaskOrder,
     setContext, interactionStart, interactionEnd, markFirst, log, addResult, setSurvey, markComplete,
     load, download, sendRemote, flush, archive, flushArchive,
   };

@@ -3,9 +3,10 @@
 
      anonId → pre → [AI 1 → mid] → [AI 2 → mid] … [AI 6 → mid] → end
 
-   Optional steps are switched in Config.STEPS; which interactions run, and
-   in what order, is Config.INTERACTIONS. build() leaves the disabled ones
-   out. A task advances the flow itself (Task calls Flow.next() on confirm).
+   Optional steps are switched in Config.STEPS; which interactions run is
+   Config.INTERACTIONS, in the session's order (Store.interactions(): shuffled
+   per participant with Config.RANDOM_INTERACTION_ORDER). build() leaves the
+   disabled ones out. A task advances the flow itself (Task calls Flow.next() on confirm).
    ═══════════════════════════════════════════════════════════════════ */
 window.Flow = (function () {
   let steps = [];
@@ -13,7 +14,7 @@ window.Flow = (function () {
 
   function build() {
     const S = Config.STEPS;
-    const list = Config.INTERACTIONS;
+    const list = Store.interactions();
     steps = [];
 
     if (S.anonId) steps.push({ type: "anonId", label: "Participant ID" });

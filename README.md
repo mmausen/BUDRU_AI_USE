@@ -2,23 +2,30 @@
 
 A lighter successor of [designing-trust-pt](https://github.com/mmausen/designing-trust-pt).
 The focus moves from observability to **AI interaction paradigms**: every participant
-runs the same sorting task under six different ways of working with an AI.
+runs the same sorting task under several different ways of working with an AI
+(five active; `radial` is disabled).
 
 There are no AI characters (bold / cautious) and no counterbalanced groups (G1, G2 …):
-everyone gets the same interactions in the same order.
+everyone gets the same interactions, but each participant gets them in a fresh random
+order (`Config.RANDOM_INTERACTION_ORDER`).
 
 ## Flow
 
 ```
 Participant ID → pre-questionnaire
-  → AI 1 HINT     → mid-questionnaire
-  → AI 2 MAGNET   → mid-questionnaire
-  → AI 3 RADIAL   → mid-questionnaire
-  → AI 4 HEATMAP  → mid-questionnaire
-  → AI 5 HANDOFF  → mid-questionnaire
-  → AI 6 OVERRIDE → mid-questionnaire
+  → AI 1 → mid-questionnaire
+  → AI 2 → mid-questionnaire
+  → AI 3 → mid-questionnaire
+  → AI 4 → mid-questionnaire
+  → AI 5 → mid-questionnaire
   → thank-you page
 ```
+
+AI 1–5 are HINT, MAGNET, HEATMAP, HANDOFF and OVERRIDE, shuffled per participant.
+The order is stored in the session as `interactions`; with
+`RANDOM_INTERACTION_ORDER = false` it is the order of `Config.INTERACTIONS`.
+RADIAL is commented out of `Config.INTERACTIONS`. Its module stays in the code,
+so uncommenting the line brings it back.
 
 Each interaction opens with a short intro card; the ⓘ button in its banner reopens it.
 
@@ -27,7 +34,7 @@ Each interaction opens with a short intro card; the ⓘ button in its banner reo
 Both live in `strings.json` → `surveys.pre` / `mid`, in English and German. Every rating is a required 1–7 scale.
 
 - **Pre (baseline, 7 items):** general trust in AI, reliability, comfort relying on AI recommendations, then four self-reports (how often you use AI tools, familiarity, confidence evaluating AI outputs, AI for work-related tasks). The self-report items carry their own end labels, for example "Never … Very often".
-- **Mid (after each interaction, 9 items):** understanding, clarity of the AI's behaviour, control of the outcome, AI influence, AI capability, helpfulness, ease, naturalness, and willingness to rely on it again. The kicker names the interaction just used.
+- **Mid (after each interaction, 6 items):** understanding, control of the outcome, AI influence, AI capability, ease, and willingness to rely on it again. The kicker names the interaction just used.
 
 A `likert` item takes `scale` (default 7) and optional `anchors: [low, high]`; without anchors it uses "Strongly disagree … Strongly agree". Answers are validated but not stored yet (see Logging).
 
@@ -48,7 +55,7 @@ Three interchangeable task sets live in `tasks/`. All three use the same schema.
 |---|---|---|
 | `placeholder` | `tasks/placeholder.json` | Items A–F from [bdr-prototype](https://github.com/mauhci/bdr-prototype); one task, reused by all six interactions |
 | `fixed` | `tasks/fixed.json` | Process sequences with **one correct order**. Six tasks from designing-trust-pt's earlier `task_thought.json` (A01, A09, A12, A15, A23, A24) |
-| `prio` | `tasks/prio.json` | Prioritisation with a **preferred order that leaves room for interpretation**. Six tasks from designing-trust-pt's `tasks.json` (T1, T2, T5, T7, T9, T12), re-ordered |
+| `prio` | `tasks/prio.json` | Prioritisation with a **preferred order that leaves room for interpretation**. Six tasks from designing-trust-pt's `tasks.json` (T1, T2, T5, T7, T9, T12), re-ordered — v2 with short card texts; the old wording is in `tasks/prio_v1_backup.json` (not loaded) |
 
 Each file has the same schema:
 
@@ -74,7 +81,7 @@ Each file has the same schema:
 - **`heat`** is a falloff around each tile's target slot. Each row sums to 100, and each slot column to about 100.
   - **fixed**: sharp (about 65–80% on the target slot).
   - **prio**: wider. Where a case has a competing reading, there is a second bump. Example: a "within the hour" case pulled toward the top by a deadline-first reading. The target slot is always the most likely one.
-- **prio order principle**: ongoing harm to people and losses that can't be undone come first. Then quick fixes due within the hour, then today's deadlines, then the fortnight items.
+- **prio order principle**: ongoing harm to people and losses that can't be undone come first. Then quick fixes due within the hour, then today's deadlines, then the fortnight items. The v2 card texts state timing only where it is the point of the case (a waiting applicant, footage about to be overwritten).
 
 Set the default with `Config.TASK_SET`. In devMode, the dev bar's **Tasks** picker switches it live: the task on screen is rebuilt, and the browser remembers the choice. Each session records `taskSet` and `taskSource` (`config` or `dev`). The task language follows the participant's language (see Language).
 
@@ -88,6 +95,8 @@ Set the default with `Config.TASK_SET`. In devMode, the dev bar's **Tasks** pick
 The assignment is stored in the session as `taskOrder` (task ids in interaction order) and logged to the console. Switching the task set in the dev bar draws a new one. The placeholder set has one task, so the switch changes nothing there.
 
 ## AI thoughts
+
+**Currently off** (`Config.THOUGHTS.enabled: false`): no chips, no intro sentence, and `thoughtsVisible: false` in the log.
 
 With `Config.THOUGHTS.enabled`, every card carries a small purple speech-bubble chip. Hovering it (after `openDelayMs`) opens a bubble with the tile's `thought`, the AI's reasoning. It works the same in all six interactions:
 
@@ -107,7 +116,7 @@ The AI recommends the active task's `target-order`.
 |---|---|---|---|
 | 1 | `hint` | lab_01 | Pick up a card → the AI highlights the slot it suggests. It never moves anything. |
 | 2 | `magnet` | lab_02 | A spring-driven fake cursor. Within a circular radius of the AI's slot, the dragged card is pulled part of the way toward it (strength 0.24), so you can still overrule it. The radius is 2.2 slot heights, measured live, so the field feels the same at any card size or window size. |
-| 3 | `radial` | lab_03 | Rest on an inbox card → two slot options appear: the AI's slot and a decoy, in random order. |
+| 3 | `radial` *(disabled)* | lab_03 | Rest on an inbox card → two slot options appear: the AI's slot and a decoy, in random order. |
 | 4 | `heatmap` | lab_04 | Hover a card → every slot glows from white to deep purple by how likely the AI thinks it belongs there. |
 | 5 | `handoff` | lab_05 + [bdr-dt-handoff](https://github.com/mmausen/mmausen.github.io-bdr-dt-handoff) | A purple take-over zone floats over the lower centre of the board. Rest the cursor inside it (0.25 s, `dwellMs`) and the AI takes the cursor and keeps sorting. Leave the zone and the AI cursor rushes back to your pointer: you're in control again, and a card it was carrying returns to the inbox. |
 | 6 | `override` | **new** | You sort all six alone, then hand over. The AI moves every tile it disagrees with. |
@@ -128,7 +137,8 @@ npm start       # → http://localhost:8080
 
 ## Configuring (`js/config.js`)
 
-- `INTERACTIONS` — an array, and its order is the running order. Remove an entry to drop that interaction.
+- `INTERACTIONS` — an array of the interactions that run. Remove or comment out an entry to drop that interaction (radial is commented out).
+- `RANDOM_INTERACTION_ORDER` — `true`: a fresh random order per participant; `false`: the array's order.
 - `LANG` — `default` language (`"en"` / `"de"`) and whether the EN / DE `switcher` is shown.
 - `RANDOM_TASK_ASSIGNMENT` — random task per interaction, per session (see Task sets).
 - `THOUGHTS` — `enabled` shows the AI's reasoning on each card; `openDelayMs` is the hover delay.
@@ -175,7 +185,7 @@ Before the ID, nothing is written. Without the ID step (`STEPS.anonId: false`), 
 | `thoughtsVisible` | Whether the AI thought chips were shown at all (`Config.THOUGHTS.enabled`). Also on every result. |
 | `results` | Per AI interaction, on Confirm: see below |
 | `events` | Every pick-up, placement and AI event: see below |
-| also | language and switches (`lang`, `langChanges`), task set and assignment (`taskSet`, `taskOrder`), interaction order, step and config switches, `completed` |
+| also | language and switches (`lang`, `langChanges`), task set and assignment (`taskSet`, `taskOrder`), interaction order (`interactions`, `interactionOrderRandom`), step and config switches, `completed` |
 
 All times are local ISO 8601 with the UTC offset, e.g. `2026-11-04T10:32:21.247+01:00`. Cards are tile keys (as in `tasks/*.json`); slots are 1-based (1 = top).
 
