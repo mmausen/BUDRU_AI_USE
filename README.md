@@ -118,8 +118,8 @@ The AI recommends the active task's `target-order`.
 | 2 | `magnet` | lab_02 | A spring-driven fake cursor. Within a circular radius of the AI's slot, the dragged card is pulled part of the way toward it (strength 0.24), so you can still overrule it. The radius is 2.2 slot heights, measured live, so the field feels the same at any card size or window size. |
 | 3 | `radial` *(disabled)* | lab_03 | Rest on an inbox card → two slot options appear: the AI's slot and a decoy, in random order. |
 | 4 | `heatmap` | lab_04 | Hover a card → every slot glows from white to deep purple by how likely the AI thinks it belongs there. |
-| 5 | `handoff` | lab_05 + [bdr-dt-handoff](https://github.com/mmausen/mmausen.github.io-bdr-dt-handoff) | A purple take-over zone floats over the lower centre of the board. Rest the cursor inside it (0.25 s, `dwellMs`) and the AI takes the cursor and keeps sorting. Leave the zone and the AI cursor rushes back to your pointer: you're in control again, and a card it was carrying returns to the inbox. |
-| 6 | `override` | **new** | You sort all six alone, then hand over. The AI moves every tile it disagrees with. |
+| 5 | `handoff` | lab_05 + [bdr-dt-handoff](https://github.com/mmausen/mmausen.github.io-bdr-dt-handoff) | A purple take-over zone floats over the lower centre of the board. Rest the cursor inside it (0.25 s, `dwellMs`) and the AI takes the cursor and keeps sorting. It fills the ranking top to bottom, each tile into its own AI slot: first only tiles whose slot is still empty; once none are left, it also places the rest and overrides whatever sits there (that tile goes back to the inbox). Leave the zone and the AI cursor rushes back to your pointer: you're in control again, and a card it was carrying returns to the inbox. |
+| 6 | `override` | **new** | You sort all six alone, then hand over. The AI moves every tile it disagrees with and marks it "AI". A tile you move afterwards (or push aside with a swap) loses the mark. |
 
 **Override always overrides.** The AI changes at least `Config.OVERRIDE.minOverrides`
 (default 1) of your tiles. If your order already matches the AI's ranking exactly, it swaps

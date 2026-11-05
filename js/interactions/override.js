@@ -24,7 +24,8 @@ Interactions.register("override", {
     let phase = "sort";
     const aiMoved = new Set();     // ids the AI moved — marked on their cards
     let cursor = null;
-    let userOrder = null, changes = null;   // the order handed over; tiles the AI changed
+    let userOrder = null, changes = null;
+    let before = null;             // the slots when the participant's current drag began   // the order handed over; tiles the AI changed
 
     const b = Board.create(container, {
       key: "override",
@@ -38,7 +39,17 @@ Interactions.register("override", {
           div.insertAdjacentHTML("beforeend", '<span class="ai-tag">AI</span>');
         }
       },
-      onDragStart() { if (phase === "review") b.$(".t-note").textContent = ""; },
+      onDragStart() {
+        before = b.slots.slice();
+        if (phase === "review") b.$(".t-note").textContent = "";
+      },
+      // A tile the participant moves (or pushes aside with a swap) after the
+      // AI's pass is theirs again: it loses the AI mark.
+      onDragEnd() {
+        if (!before) return;
+        [...aiMoved].forEach(id => { if (b.slots.indexOf(id) !== before.indexOf(id)) aiMoved.delete(id); });
+        before = null;
+      },
       onRender() {
         const hb = b.$(".t-handover");
         if (hb) {

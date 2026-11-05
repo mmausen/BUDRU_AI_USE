@@ -7,7 +7,8 @@
    the tile → grab → carry → drop). Leaving the zone hands control straight
    back: the AI cursor rushes to the participant's pointer and fades out, and
    a tile it was carrying goes back to the inbox untouched. The AI drops each
-   tile in its own suggested slot.
+   tile in its own suggested slot, top to bottom, filling empty slots before
+   it overrides any placed tile (see pickNext).
    Logs "ai_takeover" / "ai_takeback" (reason: left_zone | done | paused);
    the AI's drops are placements with by "ai".
    ═══════════════════════════════════════════════════════════════════ */
@@ -145,40 +146,52 @@ Interactions.register("handoff", {
     }
 
     /* ── AI motion planning (queue of pause / move / grab / drop) ── */
-    const pushMove = (x, y, ease, curve) => fc.queue.push({ type: "move", to: { x, y }, ease: ease || "cubic", curve: curve == null ? 0.12 : curve, t: 0 });
+    // minDur: a floor for the move's duration, so a short final approach is still
+    // slow enough to follow (distance alone would make it a near-instant snap).
+    const pushMove = (x, y, ease, curve, minDur) => fc.queue.push({ type: "move", to: { x, y }, ease: ease || "cubic", curve: curve == null ? 0.12 : curve, minDur: minDur || 170, t: 0 });
     const pushPause = ms => fc.queue.push({ type: "pause", dur: ms, t: 0 });
     const pushGrab = id => fc.queue.push({ type: "grab", id });
     const pushDrop = slot => fc.queue.push({ type: "drop", slot });
     const tileCenter = id => b.centerOf(b.$(`.t-inbox [data-id="${id}"]`));
 
+    /* Placing strategy: the AI fills the ranking top to bottom, each tile into
+       its own suggested slot.
+         1. Only tiles whose AI slot is still empty, the topmost slot first, so
+            it never overrides a tile already placed (by the participant or itself).
+         2. When every remaining tile's AI slot is taken, it places those too,
+            topmost first, and the tile it overrides goes back to the inbox.
+       A tile sitting in its own AI slot is never displaced, so step 2 always
+       ends with the AI's ranking. */
+    function pickNext(free) {
+      const bySlot = free.slice().sort((x, y) => b.aiSlot(x.id) - b.aiSlot(y.id));
+      return bySlot.find(c => !b.slots[b.aiSlot(c.id)]) || bySlot[0];
+    }
+
     function planJob() {
       const free = b.inbox.filter(c => c.id !== fc.carrying);
       if (!free.length) { pushPause(400); return; }
-      // nearest unplaced tile to the cursor
-      let target = free[0], best = Infinity;
-      free.forEach(c => {
-        const ctr = tileCenter(c.id);
-        if (ctr) { const d = distp(fc.x, fc.y, ctr.x, ctr.y); if (d < best) { best = d; target = c; } }
-      });
+      const target = pickNext(free);
       const cc = tileCenter(target.id);
       if (!cc) { pushPause(300); return; }
       const hes = CFG.hesitate;
 
       pushPause(hes ? rand(350, 1000) : rand(120, 260));                 // 1. think
       if (hes && Math.random() < 0.6) {                                  // 2. travel (maybe second-guess)
-        pushMove(cc.x + rand(-40, 40), cc.y + rand(-44, -14), "cubic", 0.18);
+        pushMove(cc.x + rand(-40, 40), cc.y + rand(-14, 14), "cubic", 0.18);   // hover over the tile itself
         pushPause(rand(180, 480));
-        pushMove(cc.x, cc.y, "back", 0.05);
+        pushMove(cc.x, cc.y, "cubic", 0.05, 320);
       } else pushMove(cc.x, cc.y, "back", 0.13);
       pushGrab(target.id);                                               // 3. grab
       pushPause(hes ? rand(160, 360) : rand(90, 170));
       const slotIdx = b.aiSlot(target.id);                               // 4. carry to the AI's slot
       const sc = b.centerOf(b.slotEl(slotIdx)) || { x: fc.x, y: fc.y };
+      // A hesitation hover stays INSIDE the target slot (a small sideways offset),
+      // never over the slot above, and the settle into place is a slow glide.
       if (hes && Math.random() < 0.5) {
-        pushMove(sc.x + rand(-30, 30), sc.y - rand(40, 80), "cubic", 0.10);
+        pushMove(sc.x + rand(-70, 70), sc.y + rand(-6, 6), "cubic", 0.10);
         pushPause(rand(200, 520));
-        pushMove(sc.x, sc.y, "cubic", 0.04);
-      } else pushMove(sc.x, sc.y, "back", 0.08);
+        pushMove(sc.x, sc.y, "cubic", 0.04, 360);
+      } else pushMove(sc.x, sc.y, "cubic", 0.08);
       pushDrop(slotIdx);                                                 // 5. drop
       pushPause(hes ? rand(260, 520) : rand(160, 300));
     }
@@ -192,7 +205,7 @@ Interactions.register("handoff", {
       const amp = d * fc.seg.curve * (Math.random() < 0.5 ? -1 : 1);
       fc.seg.p0 = p0; fc.seg.p1 = p1;
       fc.seg.ctrl = { x: (p0.x + p1.x) / 2 + nx * amp, y: (p0.y + p1.y) / 2 + ny * amp };
-      fc.seg.dur = clamp(d / speedPPS() * 1000 * (CFG.hesitate ? 1.22 : 1), 170, 4000);
+      fc.seg.dur = clamp(d / speedPPS() * 1000 * (CFG.hesitate ? 1.22 : 1), fc.seg.minDur || 170, 4000);
       fc.seg.t = 0;
     }
     const bezier = (p0, c, p1, t) => { const u = 1 - t; return { x: u * u * p0.x + 2 * u * t * c.x + t * t * p1.x, y: u * u * p0.y + 2 * u * t * c.y + t * t * p1.y }; };
