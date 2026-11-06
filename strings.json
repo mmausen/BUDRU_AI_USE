@@ -34,7 +34,14 @@
         "start": "Start",
         "info": "How does this work?",
         "thought": "The AI's reasoning",
-        "thoughtIntro": "Hover the speech bubble on a card to read the AI's reasoning for it."
+        "thoughtIntro": "Hover the speech bubble on a card to read the AI's reasoning for it.",
+        "return": "Return"
+      },
+      "overview": {
+        "title": "Overview",
+        "note": "The study is complete. Open any interaction to try it again — this time with example cases. Nothing is recorded any more.",
+        "finish": "Finish",
+        "revisiting": "Revisiting"
       },
       "end": {
         "title": "Thank you for participating!",
@@ -253,7 +260,14 @@
         "start": "Start",
         "info": "Wie funktioniert das?",
         "thought": "Die Überlegung der KI",
-        "thoughtIntro": "Fahren Sie über die Sprechblase auf einer Karte, um die Überlegung der KI dazu zu lesen."
+        "thoughtIntro": "Fahren Sie über die Sprechblase auf einer Karte, um die Überlegung der KI dazu zu lesen.",
+        "return": "Zurück"
+      },
+      "overview": {
+        "title": "Übersicht",
+        "note": "Die Studie ist abgeschlossen. Öffnen Sie eine Interaktion, um sie noch einmal auszuprobieren – diesmal mit Beispielfällen. Es wird nichts mehr aufgezeichnet.",
+        "finish": "Beenden",
+        "revisiting": "Erneut ansehen"
       },
       "end": {
         "title": "Vielen Dank für Ihre Teilnahme!",

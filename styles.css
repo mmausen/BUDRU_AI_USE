@@ -35,6 +35,18 @@ input,textarea{font-family:inherit;-webkit-user-select:text;user-select:text}
 .pid-row input:focus{border-color:#888}
 .form-error{font-size:13px;color:#b00020}
 
+/* ── overview (after the study: revisit an interaction) ── */
+.ov-list{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.ov-item{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:11px 14px;
+  border:1px solid var(--line);border-radius:9px;background:#fff;cursor:pointer;font:inherit;color:var(--txt)}
+.ov-item:hover{border-color:#888;background:var(--you-l)}
+.ov-n{width:24px;height:24px;border-radius:50%;background:var(--you-l);display:grid;place-items:center;
+  font-size:12px;font-weight:700;color:var(--muted);flex:none}
+.ov-txt{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+.ov-badge{font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:var(--ai)}
+.ov-title{font-size:14px;color:var(--txt2)}
+.ov-go{color:var(--muted);font-size:15px;flex:none}
+
 /* ── buttons ── */
 .btn,.t-btn{padding:8px 18px;border-radius:7px;border:1px solid var(--line);font-size:13.5px;font-weight:600;
   cursor:pointer;background:#fff;color:var(--txt)}

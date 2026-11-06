@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>DFKI · AI Use</title>
-<link rel="stylesheet" href="styles.css?v=11"/>
+<link rel="stylesheet" href="styles.css?v=12"/>
 </head>
 <body>
 
@@ -72,6 +72,22 @@
   </div>
 </section>
 
+<!-- ════════════ OVERVIEW ════════════ end of the study and the logging; the
+     interviewer can reopen each interaction (placeholder task, not logged). -->
+<section id="screen-overview" class="screen" hidden>
+  <div class="centered">
+    <h1 class="screen-kicker" data-s="ui.brand"></h1>
+    <div class="panel">
+      <h2 data-s="ui.overview.title"></h2>
+      <p data-s="ui.overview.note"></p>
+      <div class="ov-list" id="overview-list"></div>
+    </div>
+    <div class="start-row">
+      <button class="btn btn-primary" id="btn-overview-finish" data-s="ui.overview.finish"></button>
+    </div>
+  </div>
+</section>
+
 <!-- ════════════ THANK YOU / END ════════════ terminal, no way forward -->
 <section id="screen-end" class="screen" hidden>
   <div class="centered">
@@ -103,8 +119,8 @@
 
 <script src="js/config.js?v=12"></script>
 <script src="js/strings.js?v=4"></script>
-<script src="js/store.js?v=7"></script>
-<script src="js/tasks.js?v=4"></script>
+<script src="js/store.js?v=8"></script>
+<script src="js/tasks.js?v=5"></script>
 <script src="js/board.js?v=5"></script>
 <script src="js/ai-cursor.js?v=4"></script>
 <script src="js/interactions/hint.js?v=4"></script>
@@ -113,9 +129,9 @@
 <script src="js/interactions/heatmap.js?v=6"></script>
 <script src="js/interactions/handoff.js?v=12"></script>
 <script src="js/interactions/override.js?v=5"></script>
-<script src="js/task.js?v=5"></script>
-<script src="js/screens.js?v=7"></script>
-<script src="js/flow.js?v=5"></script>
-<script src="js/main.js?v=7"></script>
+<script src="js/task.js?v=6"></script>
+<script src="js/screens.js?v=8"></script>
+<script src="js/flow.js?v=6"></script>
+<script src="js/main.js?v=8"></script>
 </body>
 </html>

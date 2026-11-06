@@ -18,8 +18,16 @@ Participant ID → pre-questionnaire
   → AI 3 → mid-questionnaire
   → AI 4 → mid-questionnaire
   → AI 5 → mid-questionnaire
+  → overview (end of the study and of logging)
   → thank-you page
 ```
+
+**Overview (for the interview).** Reaching the overview ends the study: the session
+is marked `completed` (`completedAt`), sent one last time, and the store is frozen,
+so nothing after this point is recorded. It lists the five interactions in the
+session's order; clicking one reopens it with the **placeholder** task (whatever set
+the study ran with). There the Confirm button reads **Return** (always enabled) and
+leads back to the overview. **Finish** goes on to the thank-you page.
 
 AI 1–5 are HINT, MAGNET, HEATMAP, HANDOFF and OVERRIDE, in that fixed order
 (`Config.INTERACTIONS`). `RANDOM_INTERACTION_ORDER = true` would shuffle them per
@@ -234,7 +242,7 @@ A task rebuilt by a language switch starts its counters afresh; its events stay 
 |---|---|
 | `js/config.js` | Study settings |
 | `js/flow.js` | Step machine |
-| `js/screens.js` | Participant ID, questionnaires, thank-you page |
+| `js/screens.js` | Participant ID, questionnaires, overview, thank-you page |
 | `js/task.js` | Hosts one interaction as a step: intro card, confirm, teardown |
 | `js/tasks.js` | Loads the three task sets and flattens a task to one language |
 | `js/board.js` | Shared sorting board: tiles, inbox, ladder, drag, hit-testing, plus the `Interactions` registry |

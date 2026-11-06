@@ -12,6 +12,11 @@
    the logging context every board event is stamped with, and on Confirm
    stores the result: the final ranking against the AI's, plus the board's
    counters (b.stats).
+
+   A step with `revisit: true` comes from the overview screen (after the
+   study): it runs the placeholder task, records nothing (the store is frozen
+   by then), and its Confirm button is a Return button, always enabled, that
+   goes back to the overview.
    ═══════════════════════════════════════════════════════════════════ */
 window.Task = (function () {
   const $ = id => document.getElementById(id);
@@ -24,27 +29,43 @@ window.Task = (function () {
     step = s;
     const mod = Interactions.get(s.interaction);
     Flow.showScreen("screen-task");
-    $("task-progress").textContent = S.t("ui.task.progress", { n: s.n, total: s.total });
+    $("task-progress").textContent = s.revisit
+      ? S.t("ui.overview.revisiting")
+      : S.t("ui.task.progress", { n: s.n, total: s.total });
     if (!mod) {
       $("task-host").innerHTML = "";
       console.error(`[BDR] no interaction module "${s.interaction}" — check Config.INTERACTIONS`);
       return;
     }
-    const task = Tasks.forRound(s.n);
-    Store.setContext({ n: s.n, interaction: s.interaction, taskId: task ? task.id : null });
+    const task = s.revisit ? Tasks.placeholder() : Tasks.forRound(s.n);
+    Store.setContext(s.revisit ? null : { n: s.n, interaction: s.interaction, taskId: task ? task.id : null });
     board = mod.mount($("task-host"), {
       task,
       onConfirm: confirm,
       // Paused while the intro card is open or an AI thought is being read.
       paused: () => explainerOpen || !!(board && board.thoughtOpen),
     });
+    if (s.revisit) asReturn(board.$(".t-confirm"));
     const info = board.$(".t-info");
     if (info) info.addEventListener("click", openExplainer);
     openExplainer();
   }
 
+  /* Revisit: the Confirm button becomes Return. Swapped for a fresh copy so
+     the board's own listener and enable/disable logic no longer apply. */
+  function asReturn(btn) {
+    if (!btn) return;
+    const ret = btn.cloneNode(false);
+    ret.textContent = S.t("ui.task.return");
+    ret.disabled = false;
+    ret.classList.add("t-return");
+    ret.addEventListener("click", () => { stop(); Screens.overview(); });
+    btn.replaceWith(ret);
+  }
+
   function stop() {
     if (board) { board.destroy(); board = null; }
+    step = null;
     Store.setContext(null);
     closeExplainer();
     $("task-host").innerHTML = "";
@@ -103,7 +124,7 @@ window.Task = (function () {
   function wire() {
     $("explainer-ok").addEventListener("click", () => {
       closeExplainer();
-      if (step && board) {                       // the interaction starts now (kept on later reopenings)
+      if (step && board && !step.revisit) {      // the interaction starts now (kept on later reopenings)
         const task = Tasks.forRound(step.n);
         Store.interactionStart(step, task ? task.id : null);
         Store.sendRemote();
@@ -111,5 +132,5 @@ window.Task = (function () {
     });
   }
 
-  return { start, stop, wire };
+  return { start, stop, wire, current: () => step };
 })();

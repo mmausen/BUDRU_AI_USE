@@ -22,6 +22,8 @@
      events[]   — every pick-up, placement, thought read and AI event, tagged
                   with the running interaction (setContext) — also events.jsonl
      thoughtsVisible — whether the AI thought chips were shown at all
+     completed / completedAt — the study part ended (the overview screen was reached).
+       Nothing after that is recorded: revisiting interactions there is not logged.
    Times are local ISO strings with the UTC offset (2026-11-04T10:21:33.120+01:00).
    Slots in results and events are 1-based (1 = top); cards are tile keys.
    ═══════════════════════════════════════════════════════════════════ */
@@ -32,6 +34,9 @@ window.Store = (function () {
   const SCHEMA_VERSION = 1;
   const perfStart = performance.now();
   let data = null;
+  // Set by freeze() when the study part ends (overview screen): from then on nothing
+  // is recorded or sent, so revisiting interactions in the interview leaves no trace.
+  let frozen = false;
 
   // Master switch (Config.CONFIG.fileLogging). Off → nothing is POSTed, so no files are written.
   const logging = () => Config.CONFIG.fileLogging === true;
@@ -59,6 +64,7 @@ window.Store = (function () {
   }
 
   function newSession(pid) {
+    frozen = false;
     archiveCurrent("replaced by a new session");
     const now = new Date();
     const started = localIso(now);
@@ -97,7 +103,7 @@ window.Store = (function () {
   function get() { return data; }
   // This session's interaction order (falls back to the config order before a session exists).
   function interactions() { return data && data.interactions ? data.interactions.slice() : Config.INTERACTIONS.slice(); }
-  function setStep(i) { if (data) { data.currentStep = i; save(); } }
+  function setStep(i) { if (data && !frozen) { data.currentStep = i; save(); } }
   // The typed ID also fixes the log folder: <timestamp of entry>_<ID>. Set once per session.
   function setAnonId(v) {
     if (!data) return;
@@ -117,7 +123,7 @@ window.Store = (function () {
   }
   // `switched` → the participant changed it (recorded with the step it happened on).
   function setLang(lang, switched) {
-    if (!data) return;
+    if (!data || frozen) return;
     if (switched && lang !== data.lang) data.langChanges.push({ lang, step: data.currentStep, at: new Date().toISOString() });
     data.lang = lang;
     save();
@@ -131,7 +137,7 @@ window.Store = (function () {
   /* ── AI interaction times ── one entry per interaction (n). A task rebuilt
      mid-run (language switch, ⓘ reopened) keeps its first start. */
   function interactionStart(step, taskId) {
-    if (!data) return;
+    if (!data || frozen) return;
     let r = data.interactionTimes.find(x => x.n === step.n);
     if (r && !r.endedAt) return;                      // already running
     if (r) data.interactionTimes.splice(data.interactionTimes.indexOf(r), 1);   // dev: run again
@@ -143,7 +149,7 @@ window.Store = (function () {
     save();
   }
   function interactionEnd(step) {
-    if (!data) return;
+    if (!data || frozen) return;
     const r = data.interactionTimes.find(x => x.n === step.n);
     if (!r || r.endedAt) return;
     const now = new Date();
@@ -155,7 +161,7 @@ window.Store = (function () {
   // The participant's first pick-up ("firstMoveAt") / the first card placed by anyone
   // ("firstPlacementAt") in the running interaction. Only the first one counts.
   function markFirst(field) {
-    if (!data || !context) return;
+    if (!data || !context || frozen) return;
     const r = data.interactionTimes.find(x => x.n === context.n);
     if (!r || r.endedAt || r[field]) return;
     const now = new Date();
@@ -166,7 +172,7 @@ window.Store = (function () {
 
   /* ── the logging API ── */
   function log(type, payload) {
-    if (!data || !logging()) return;
+    if (!data || !logging() || frozen) return;
     data.events.push(Object.assign(
       { type, at: localIso(), ts: Date.now(), tRel: Math.round(performance.now() - perfStart) },
       context || {},
@@ -174,11 +180,22 @@ window.Store = (function () {
     ));
     save();
   }
-  function addResult(r) { if (data && logging()) { data.results.push(r); save(); } }
+  function addResult(r) { if (data && logging() && !frozen) { data.results.push(r); save(); } }
   function setSurvey(id, answers) {
-    if (data) { data.surveys[id] = { answers, submittedAt: localIso() }; save(); }
+    if (data && !frozen) { data.surveys[id] = { answers, submittedAt: localIso() }; save(); }
   }
-  function markComplete() { if (data) { data.completed = true; save(); } }
+  function markComplete() {
+    if (data && !frozen) { data.completed = true; data.completedAt = localIso(); save(); }
+  }
+  // End of the study and of logging: the last complete session goes to the collector,
+  // then the store stops recording (see `frozen`).
+  function freeze() {
+    if (!data || frozen) return;
+    markComplete();
+    sendRemote();          // the body is serialised synchronously, before frozen is set
+    frozen = true;
+  }
+  const isFrozen = () => frozen;
 
   /* ── localStorage ── */
   function save() {
@@ -273,7 +290,7 @@ window.Store = (function () {
   return {
     SCHEMA_VERSION,
     newSession, get, interactions, setStep, setAnonId, anonId, setTasks, setLang, setTaskOrder,
-    setContext, interactionStart, interactionEnd, markFirst, log, addResult, setSurvey, markComplete,
+    setContext, interactionStart, interactionEnd, markFirst, log, addResult, setSurvey, markComplete, freeze, isFrozen,
     load, download, sendRemote, flush, archive, flushArchive,
   };
 })();

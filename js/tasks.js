@@ -70,8 +70,16 @@ window.Tasks = (function () {
     return flatten(tasks.find(t => t.id === id) || tasks[(n - 1) % tasks.length]);
   }
 
-  function flatten(t) {
-    const meta = data[set].meta || {};
+  /* The task for revisiting an interaction on the overview screen: always the
+     placeholder set's first task, whatever set the study ran with. */
+  function placeholder() {
+    const tasks = (data.placeholder && data.placeholder.tasks) || [];
+    return tasks.length ? flatten(tasks[0], "placeholder") : null;
+  }
+
+  function flatten(t, from) {
+    const src = from || set;
+    const meta = data[src].meta || {};
     const labels = (meta.labels && (meta.labels[lang] || meta.labels.en)) || {};
     const p = o => (o && (o[lang] || o.en)) || {};
     const tiles = t.tiles.map(x => ({
@@ -84,7 +92,7 @@ window.Tasks = (function () {
       heat: Array.isArray(x.heat) && x.heat.length === t.tiles.length ? x.heat.slice() : null,
     }));
     return {
-      id: t.id, set, lang,
+      id: t.id, set: src, lang,
       title: p(t).title || "",
       description: p(t).description || "",
       labels,
@@ -93,6 +101,6 @@ window.Tasks = (function () {
     };
   }
 
-  return { SETS, load, init, choose, setLang, assign, forRound,
+  return { SETS, load, init, choose, setLang, assign, forRound, placeholder,
            set: () => set, lang: () => lang, has: name => !!data[name] };
 })();

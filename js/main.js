@@ -152,7 +152,10 @@ window.Dev = (function () {
     Store.setLang(l, true);
     const cur = Flow.current();
     if (!cur) return;
-    if (cur.type === "survey") Screens.relabel();
+    const t = Task.current();
+    if (t && t.revisit) Task.start(t);             // a revisited interaction: rebuild it
+    else if (cur.type === "overview") Screens.overview();
+    else if (cur.type === "survey") Screens.relabel();
     else if (cur.type === "task") Flow.go(Flow.index());
   }
   function wireLang() {
