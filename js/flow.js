@@ -1,7 +1,11 @@
 /* ═══════════════════════════════════════════════════════════════════
    FLOW — the step machine. One linear sequence:
 
-     anonId → pre → [AI 1 → mid] → [AI 2 → mid] … [AI 6 → mid] → end
+     anonId → pre → [AI 1 → mid] → [AI 2 → mid] … [AI 6 → mid] → overview → end
+
+   The overview ends the study and the logging (Store.freeze). From there
+   the interviewer can reopen any interaction (placeholder task, not logged)
+   and Finish leads to the thank-you page.
 
    Optional steps are switched in Config.STEPS; which interactions run is
    Config.INTERACTIONS, in the session's order (Store.interactions(): shuffled
@@ -30,6 +34,7 @@ window.Flow = (function () {
                                     after: key, label: `Mid-questionnaire ${n}` });
     });
 
+    steps.push({ type: "overview", label: "Overview (interview)" });
     steps.push({ type: "end", label: "Thank you" });
   }
 
@@ -46,6 +51,7 @@ window.Flow = (function () {
       case "anonId": Screens.anonId(); break;
       case "survey": Screens.survey(step); break;
       case "task":   Task.start(step); break;
+      case "overview": Screens.overview(); break;
       case "end":    Screens.end(); break;
     }
   }

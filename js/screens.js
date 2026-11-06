@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════════
    SCREENS — everything that is not a task: the participant-ID step, the
-   questionnaires (pre / mid) and the thank-you page.
+   questionnaires (pre / mid), the overview and the thank-you page.
 
    Questionnaires live in strings.json (surveys.<id>, per language). A
    "likert" item is a 1…`scale` rating (default 7) with end labels from its
@@ -131,9 +131,35 @@ window.Screens = (function () {
     Flow.next();
   }
 
+  /* ── overview ── end of the study and of the logging. For the interview
+     afterwards: one button per interaction (in the session's order) reopens
+     it with the placeholder task (Task, revisit mode — Return comes back
+     here); Finish goes on to the thank-you page. */
+  function overview() {
+    Store.freeze();
+    Flow.showScreen("screen-overview");
+    const list = $("overview-list");
+    list.innerHTML = "";
+    Store.interactions().forEach((key, idx) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "ov-item";
+      btn.innerHTML = '<span class="ov-n"></span><span class="ov-txt"><span class="ov-badge"></span>' +
+                      '<span class="ov-title"></span></span><span class="ov-go">↗</span>';
+      btn.querySelector(".ov-n").textContent = idx + 1;
+      btn.querySelector(".ov-badge").textContent = S.t(`interactions.${key}.badge`);
+      btn.querySelector(".ov-title").textContent = S.t(`interactions.${key}.title`);
+      btn.addEventListener("click", () => Task.start({
+        type: "task", interaction: key, n: idx + 1, total: list.length, revisit: true,
+      }));
+      list.appendChild(btn);
+    });
+    $("screen-overview").scrollTop = 0;
+  }
+
   /* ── thank-you / end ── terminal, no way forward */
   function end() {
-    Store.markComplete();
+    Store.markComplete();      // no-op after the overview froze the store
     Store.sendRemote();
     Flow.showScreen("screen-end");
   }
@@ -145,7 +171,8 @@ window.Screens = (function () {
       if (e.key === "Enter") { e.preventDefault(); submitAnonId(); }
     });
     $("btn-survey-next").addEventListener("click", submitSurvey);
+    $("btn-overview-finish").addEventListener("click", () => Flow.next());
   }
 
-  return { wire, anonId, survey: surveyScreen, relabel, end };
+  return { wire, anonId, survey: surveyScreen, relabel, overview, end };
 })();
